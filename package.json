@@ -1,0 +1,9 @@
+{
+  "name": "weyland-yutani-corp",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Alien franchise visualizations (single-page, JSON-fed)",
+  "scripts": {
+    "start": "node server.js"
+  }
+}

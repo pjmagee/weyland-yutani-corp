@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Alien Franchise — Visualizations</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    html, body { height: 100%; margin: 0; font-family: system-ui, Segoe UI, Arial, sans-serif; background: #f6f6f6; }
+    .tabs { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-bottom: 1px solid #ddd; background: #fff; position: sticky; top: 0; z-index: 10; }
+    .tab-btn { appearance: none; border: 1px solid #ccc; background: #fafafa; color: #222; padding: 6px 10px; border-radius: 8px; font-size: 13px; cursor: pointer; }
+    .tab-btn[aria-selected="true"] { background: #e9f2ff; border-color: #8fb6ff; }
+    .panels { height: calc(100vh - 46px); }
+    .panel { display: none; height: 100%; }
+    .panel.active { display: block; }
+    /* Reaction styles */
+    .reaction-wrap { height: 100%; position: relative; }
+    .reaction-wrap svg { width: 100%; height: 100%; display: block; background: #fff; }
+    .reaction-search { position: absolute; top: 10px; left: 10px; z-index: 3; }
+    .reaction-search input { padding: 6px 8px; border-radius: 6px; border: 1px solid #bbb; background: #fff; font-size: 12px; width: 220px; }
+    .reaction-legend { position: absolute; top: 10px; right: 10px; z-index: 3; background: rgba(255,255,255,0.95); border: 1px solid #ddd; border-radius: 8px; padding: 8px 10px; max-width: 260px; }
+    .tip { position: fixed; pointer-events: none; background: #111; color: #fff; padding: 8px 10px; border-radius: 8px; font-size: 12px; opacity: 0; transition: opacity .12s; max-width: 360px; z-index: 9999; }
+    .pill { display: inline-block; border: 1px solid #888; border-radius: 9999px; padding: 1px 6px; margin: 2px 4px 0 0; font-size: 11px; background: #fff; color: #333; }
+    .edge { fill: none; stroke: #777; stroke-width: 1.6; vector-effect: non-scaling-stroke }
+    .node circle, .node rect { stroke: #222; stroke-width: 1.5; vector-effect: non-scaling-stroke }
+    .label { font-size: 12px; pointer-events: none; text-anchor: middle; dominant-baseline: middle }
+    .highlight circle, .highlight rect { stroke: #ff4081 !important; stroke-width: 3 !important; }
+    .edge.edge-highlight { stroke: #ff4081 !important; stroke-width: 2.4 !important; }
+    /* DAG styles */
+    .dag-topbar { display: flex; gap: 12px; align-items: center; padding: 10px 12px; border-bottom: 1px solid #e5e5e5; position: sticky; top: 46px; background: #fff; z-index: 2; }
+    .dag-wrap { height: calc(100% - 52px); }
+    .dag-wrap svg { width: 100%; height: 100%; display: block; background: #fff; }
+    .edge-label { font-size: 11px; fill: #111; paint-order: stroke fill; stroke: #fff; stroke-width: 2px; }
+  </style>
+  <noscript>
+    <style>.panels { display: none; }</style>
+  </noscript>
+</head>
+<body>
+  <div class="tabs" role="tablist" aria-label="Alien Visualizations">
+    <button id="tab-reaction" class="tab-btn" role="tab" aria-selected="true" aria-controls="panel-reaction">Reaction Graph</button>
+    <button id="tab-dag" class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-dag">Scoped DAGs</button>
+  </div>
+  <div class="panels">
+    <div id="panel-reaction" class="panel active" role="tabpanel" aria-labelledby="tab-reaction">
+      <div class="reaction-wrap" id="reactionRoot">
+        <div class="reaction-search"><input id="reactionSearch" type="text" placeholder="Find node… (press /)" aria-label="Find node" /></div>
+        <div class="reaction-legend" id="reactionLegend" aria-label="Legend"></div>
+        <svg id="reactionSvg"></svg>
+      </div>
+    </div>
+    <div id="panel-dag" class="panel" role="tabpanel" aria-labelledby="tab-dag">
+      <div class="dag-topbar">
+        <div class="title">Alien Franchise — DAG</div>
+        <label for="dagRootSel">Root:</label>
+        <select id="dagRootSel" aria-label="Choose root"></select>
+        <div id="dagStatus" style="color:#b00;font-size:12px"></div>
+      </div>
+      <div class="dag-wrap">
+        <svg id="dagSvg"></svg>
+      </div>
+      <div id="dagTip" class="tip"></div>
+    </div>
+  </div>
+
+  <script>
+    // Basic tab controller
+    (function () {
+      const TABS = [
+        { btn: document.getElementById('tab-reaction'), panel: document.getElementById('panel-reaction'), hash: '#reaction', init: initReactionOnce },
+        { btn: document.getElementById('tab-dag'), panel: document.getElementById('panel-dag'), hash: '#dag', init: initDagOnce },
+      ];
+      let inited = new Set();
+      function select(hash) {
+        const target = TABS.find(t => t.hash === hash) || TABS[0];
+        TABS.forEach(t => {
+          const active = (t === target);
+          t.btn.setAttribute('aria-selected', String(active));
+          t.panel.classList.toggle('active', active);
+        });
+        try { localStorage.setItem('aliens-tabs-active', target.hash); } catch (_) {}
+        if (location.hash !== target.hash) { history.replaceState(null, '', target.hash); }
+        if (!inited.has(target.hash)) { inited.add(target.hash); target.init(); }
+      }
+      TABS.forEach(t => t.btn.addEventListener('click', () => select(t.hash)));
+      const initial = location.hash || (function(){ try { return localStorage.getItem('aliens-tabs-active'); } catch (_) { return null; } })() || '#reaction';
+      select(initial);
+    })();
+
+    // ========= Reaction Graph (loads reaction.json) =========
+    function initReactionOnce() {
+      const svg = d3.select('#reactionSvg');
+      const g = svg.append('g');
+      const tip = document.body.appendChild(Object.assign(document.createElement('div'), { className: 'tip' }));
+      const legendEl = document.getElementById('reactionLegend');
+      const searchInput = document.getElementById('reactionSearch');
+
+      const color = { host: '#ffcc66', agent: '#d27d2d', vector: '#c678dd', artifact: '#7aa2f7', stage: '#98c379', species: '#5fb3b3', organism: '#e5c07b', hybrid: '#e06c75', meta: '#C9D1D9', process: '#b3b3b3' };
+      const R = 18, RP = 13;
+      let lockedTip = false;
+
+      const zoom = d3.zoom().scaleExtent([0.25, 4]).on('zoom', ({ transform }) => g.attr('transform', transform));
+      svg.call(zoom);
+
+      const defs = svg.append('defs');
+      defs.append('marker').attr('id', 'arrow').attr('viewBox', '0 -5 10 10')
+        .attr('refX', 12).attr('refY', 0).attr('markerWidth', 8).attr('markerHeight', 8).attr('orient', 'auto')
+        .append('path').attr('d', 'M0,-5L10,0L0,5').attr('fill', '#777');
+
+      fetch('reaction.json').then(r => r.json()).then(data => {
+        const nodes = [...(data.nodes||[])];
+        const procs = (data.processes||[]).map(p => ({ ...p, type: 'process' }));
+        nodes.push(...procs);
+        const links = (data.links||[]).map(e => ({ ...e }));
+
+        const nodeMap = new Map(nodes.map(d => [d.id, d]));
+        links.forEach(e => { if (!nodeMap.has(e.source) || !nodeMap.has(e.target)) console.warn('Bad link', e); });
+
+        const sim = d3.forceSimulation(nodes)
+          .force('link', d3.forceLink(links).id(d => d.id).distance(l => (nodeMap.get(l.source.id||l.source)?.type === 'process' || nodeMap.get(l.target.id||l.target)?.type === 'process') ? 100 : 140).strength(0.55))
+          .force('charge', d3.forceManyBody().strength(-600).distanceMin(20).distanceMax(800))
+          .force('collide', d3.forceCollide().radius(d => d.type === 'process' ? RP * 1.9 : R * 1.9).iterations(2))
+          .force('center', d3.forceCenter(window.innerWidth / 2, (window.innerHeight - 46) / 2))
+          .velocityDecay(0.35);
+
+        const linkG = g.append('g').attr('stroke-linecap', 'round');
+        const link = linkG.selectAll('path.edge').data(links).enter().append('path').attr('class', 'edge').attr('marker-end', 'url(#arrow)');
+        const linkLabel = linkG.selectAll('text.edge-label').data(links).enter().append('text').attr('class', 'edge-label').attr('text-anchor', 'middle').text(d => edgeLabel(d.kind));
+
+        const nodeG = g.append('g');
+        const node = nodeG.selectAll('.node').data(nodes).enter().append('g').attr('class', 'node')
+          .call(drag(sim))
+          .on('mousemove', (evt, d) => { if (!lockedTip) showTip(d, evt); })
+          .on('mouseleave', () => { if (!lockedTip) hideTip(); })
+          .on('click', (evt, d) => { lockedTip = !lockedTip; if (lockedTip) { showTip(d, evt); tip.style.pointerEvents = 'auto'; } else { hideTip(); tip.style.pointerEvents = 'none'; } evt.stopPropagation(); });
+
+        d3.select('#reactionSvg').on('click', () => { if (lockedTip) { lockedTip = false; hideTip(); tip.style.pointerEvents = 'none'; } });
+
+        node.each(function (d) {
+          const sel = d3.select(this);
+          if (d.type === 'process') { sel.append('rect').attr('x', -RP).attr('y', -RP).attr('width', RP * 2).attr('height', RP * 2).attr('transform', 'rotate(45)').attr('fill', color.process); sel.append('text').attr('class', 'label').attr('dy', 28).text(d.id); }
+          else { sel.append('circle').attr('r', R).attr('fill', color[d.type] || '#bbb'); sel.append('text').attr('class', 'label').attr('dy', -28).text(d.id); }
+        });
+
+        sim.on('tick', () => {
+          link.attr('d', d => curved(d));
+          linkLabel.attr('x', d => (d.source.x + d.target.x) / 2).attr('y', d => (d.source.y + d.target.y) / 2 - 6);
+          node.attr('transform', d => `translate(${d.x},${d.y})`);
+        });
+
+        drawLegend(nodes, legendEl, color);
+        requestAnimationFrame(() => drawLegend(nodes, legendEl, color));
+
+        function runSearch(q) {
+          const query = (q || '').trim().toLowerCase();
+          const ids = new Set();
+          if (query) nodes.forEach(n => { if ((n.id || '').toLowerCase().includes(query)) ids.add(n.id); });
+          node.classed('highlight', d => ids.has(d.id));
+          link.classed('edge-highlight', d => ids.has(d.source.id) || ids.has(d.target.id));
+          if (ids.size === 1) { const id = Array.from(ids)[0]; const d = nodes.find(n => n.id === id); if (d && Number.isFinite(d.x) && Number.isFinite(d.y)) centerOn(d); }
+        }
+        searchInput.addEventListener('input', (e) => runSearch(e.target.value));
+        window.addEventListener('keydown', (e) => { if (e.key === '/') { e.preventDefault(); searchInput.focus(); searchInput.select(); } else if (e.key === 'Enter' && document.activeElement === searchInput) { runSearch(searchInput.value); } });
+
+        function centerOn(d) { const k = 1.6; const t = d3.zoomIdentity.translate(window.innerWidth / 2, (window.innerHeight - 46) / 2).scale(k).translate(-d.x, -d.y); svg.transition().duration(600).call(zoom.transform, t); }
+        function curved(d) { const sx = d.source.x, sy = d.source.y, tx = d.target.x, ty = d.target.y; const cx = (sx + tx) / 2, cy = (sy + ty) / 2 - 12; return `M${sx},${sy} Q${cx},${cy} ${tx},${ty}`; }
+        function drag(sim) { function dragstarted(event, d) { if (!event.active) sim.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; } function dragged(event, d) { d.fx = event.x; d.fy = event.y; } function dragended(event, d) { if (!event.active) sim.alphaTarget(0); d.fx = null; d.fy = null; } return d3.drag().on('start', dragstarted).on('drag', dragged).on('end', dragended); }
+        function edgeLabel(kind) { const map = { reproduction: 'lays/produces', maturation: 'matures', implantation: 'implants', host: 'host', evolution: 'evolves', infection: 'infects', contaminate: 'contaminates', release: 'releases', parasite: 'parasitic outcome', biogenesis: 'forms egg', experiment: 'experiment', anomalous: 'anomalous birth', origin: 'origin', impregnation: 'impregnates', result: 'result', transmission: 'transmission', cloning: 'cloning', gestation: 'gestates', parasitism: 'parasitizes' }; return map[kind] || kind; }
+        function showTip(d, evt) { const html = `<div><b>${escapeHtml(d.id)}</b></div><div class="pill">${escapeHtml(d.type)}</div>${d.notes ? `<div style="margin-top:6px">${escapeHtml(d.notes)}</div>` : ''}${Array.isArray(d.seen) ? `<div style="margin-top:6px"><b>Seen in:</b> ${d.seen.map(x => `<span class=\"pill\">${escapeHtml(x)}</span>`).join(' ')}</div>` : ''}${Array.isArray(d.src) ? `<div style=\"margin-top:6px\"><b>Sources:</b><br>${d.src.map(x => `<a href="${escapeHtml(x.url)}" target="_blank" rel="noopener">${escapeHtml(x.title)}</a>`).join('<br>')}</div>` : ''}`; tip.innerHTML = html; tip.style.left = (evt.clientX + 14) + 'px'; tip.style.top = (evt.clientY + 14) + 'px'; tip.style.opacity = 1; tip.style.pointerEvents = lockedTip ? 'auto' : 'none'; }
+        function hideTip() { tip.style.opacity = 0; }
+        function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+        function drawLegend(nodes, el, color) { if (!el) return; const order = ['host','agent','vector','artifact','stage','species','organism','hybrid','process','meta']; const used = new Set(nodes.filter(n => n && n.type && color[n.type]).map(n => n.type)); let keys = order.filter(k => used.has(k) && color[k]); if (!keys.length) keys = order.filter(k => color[k]); const entries = keys.map(k => ({ key: k, fill: color[k] })); const wrap = document.createElement('div'); wrap.style.display = 'grid'; wrap.style.gridTemplateColumns = '1fr 1fr'; wrap.style.gap = '6px 14px'; entries.forEach(({ key, fill }) => { const row = document.createElement('div'); row.style.display = 'flex'; row.style.alignItems = 'center'; row.style.gap = '8px'; const icon = document.createElement('span'); icon.style.display = 'inline-block'; icon.style.width = '14px'; icon.style.height = '14px'; icon.style.background = fill; icon.style.border = '1.5px solid #222'; if (key === 'process') { icon.style.borderRadius = '2px'; icon.style.transform = 'rotate(45deg)'; } else { icon.style.borderRadius = '9999px'; } const label = document.createElement('span'); label.textContent = key; label.style.fontSize = '12px'; row.appendChild(icon); row.appendChild(label); wrap.appendChild(row); }); el.innerHTML = ''; if (!entries.length) { const empty = document.createElement('div'); empty.textContent = 'No categories'; empty.style.fontSize = '12px'; empty.style.color = '#555'; el.appendChild(empty); } else { el.appendChild(wrap); } }
+        window.addEventListener('resize', () => sim.force('center', d3.forceCenter(window.innerWidth / 2, (window.innerHeight - 46) / 2)));
+      });
+    }
+
+    // ========= Scoped DAG (loads dag.json) =========
+    function initDagOnce() {
+      const svg = d3.select('#dagSvg');
+      const g = svg.append('g');
+      const linkG = g.append('g');
+      const nodeG = g.append('g');
+      const tip = document.getElementById('dagTip');
+      const status = document.getElementById('dagStatus');
+      const rootSel = document.getElementById('dagRootSel');
+      const zoom = d3.zoom().scaleExtent([0.3, 2]).on('zoom', (ev) => { g.attr('transform', ev.transform); });
+      svg.call(zoom);
+
+      const typeFill = { host: '#e7f1ff', artifact: '#fff7db', vector: '#fff0c2', stage: '#f3f6f9', species: '#e9f7ef', hybrid: '#f9e6ef', agent: '#efefef', organism: '#f1f8ff', process: '#fbecff' };
+      const edgeLabel = (kind) => ({ reproduction: 'lays/produces', maturation: 'matures', implantation: 'implants', host: 'host', evolution: 'evolves', infection: 'infects', contaminate: 'contaminates', release: 'releases', parasite: 'parasitic outcome', biogenesis: 'forms egg', experiment: 'experiment', anomalous: 'anomalous birth', origin: 'origin', impregnation: 'impregnates', result: 'result', transmission: 'transmission', cloning: 'cloning' })[kind] || kind;
+      function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+      function getSize() { const w = window.innerWidth; const h = window.innerHeight - 46 - 52; return { width: Math.max(960, w), height: Math.max(600, h) }; }
+
+      const SOURCES = {}; // optional: could be populated later
+      const DESCRIPTIONS = {}; // optional
+
+      fetch('dag.json').then(r => r.json()).then(DATA => {
+        const currentData = withSources(DATA);
+        const targets = targetList(currentData);
+        targets.forEach((id, i) => { const opt = document.createElement('option'); opt.value = id; opt.textContent = id; if (i === 0) opt.selected = true; rootSel.appendChild(opt); });
+        rootSel.addEventListener('change', () => render(currentData, rootSel.value));
+        status.textContent = 'Hover to preview; click to open details. Click canvas or press Esc to close.';
+        render(currentData, targets[0]);
+
+        let pinned = false; let pinnedNode = null;
+        svg.on('click', (ev) => { if (ev.target && ev.target.tagName === 'svg' && pinned) unpinTooltip(); });
+        tip.addEventListener('click', (e) => e.stopPropagation());
+        window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && pinned) unpinTooltip(); });
+
+        function withSources(d) { const copy = JSON.parse(JSON.stringify(d)); (copy.nodes||[]).forEach(n => { if (SOURCES[n.id]) n.source = SOURCES[n.id]; }); (copy.processes||[]).forEach(p => { if (SOURCES[p.id]) p.source = SOURCES[p.id]; }); return copy; }
+        function combinedNodes(d) { const ps = (d.processes||[]).map(p => ({ id: p.id, type: 'process', source: p.source })); return [...(d.nodes||[]), ...ps]; }
+        function targetList(d) { const ids = new Set(); const list = []; (d.nodes||[]).forEach(n => { if (n.type === 'species' || n.type === 'hybrid') { ids.add(n.id); list.push(n.id); } }); (d.finalProducts||[]).forEach(id => { if (!ids.has(id)) { ids.add(id); list.push(id); } }); return list; }
+        function buildMaps(d) { const nodesAll = combinedNodes(d); const nodeMap = new Map(nodesAll.map(n => [n.id, n])); const out = new Map(); const inc = new Map(); (d.links||[]).forEach(e => { if (!nodeMap.has(e.source) || !nodeMap.has(e.target)) return; if (!out.has(e.source)) out.set(e.source, []); out.get(e.source).push(e); if (!inc.has(e.target)) inc.set(e.target, []); inc.get(e.target).push(e); }); return { nodesAll, nodeMap, out, inc }; }
+        function allowedPredicateForTarget(targetId) { return _ => true; } // simplified scoping; can be extended
+        function buildSubgraph(d, targetId) { const { nodeMap, out, inc } = buildMaps(d); if (!nodeMap.has(targetId)) return { nodes: [], links: [] }; const allow = allowedPredicateForTarget(targetId); if (!allow(targetId)) return { nodes: [], links: [] }; const nodesSet = new Set([targetId]); const edges = []; const q = [targetId]; while (q.length) { const v = q.shift(); const ins = inc.get(v) || []; for (const e of ins) { if (!allow(e.source) || !allow(e.target)) continue; edges.push(e); if (!nodesSet.has(e.source)) { nodesSet.add(e.source); q.push(e.source); } } } const nodes = Array.from(nodesSet).map(id => nodeMap.get(id)).filter(Boolean); return { nodes, links: edges }; }
+
+        function render(json, target) {
+          const { width, height } = getSize(); svg.attr('viewBox', `0 0 ${width} ${height}`); nodeG.selectAll('*').remove(); linkG.selectAll('*').remove();
+          const sub = buildSubgraph(json, target); const nodes = sub.nodes; const links = sub.links; const nodeMap = new Map(nodes.map(d => [d.id, d])); const out = new Map(); const inc = new Map(); links.forEach(e => { if (!out.has(e.source)) out.set(e.source, []); out.get(e.source).push(e); if (!inc.has(e.target)) inc.set(e.target, []); inc.get(e.target).push(e); });
+          const indeg = new Map(nodes.map(n => [n.id, 0])); links.forEach(e => indeg.set(e.target, (indeg.get(e.target) || 0) + 1)); const seeds = nodes.filter(n => (indeg.get(n.id) || 0) === 0).map(n => n.id); const rank = new Map(); const q = [...seeds]; seeds.forEach(s => rank.set(s, 0)); while (q.length) { const u = q.shift(); const ru = rank.get(u); (out.get(u) || []).forEach(e => { const v = e.target; const rv = rank.has(v) ? rank.get(v) : Infinity; const nr = ru + 1; if (nr < rv) { rank.set(v, nr); q.push(v); } }); }
+          const layered = d3.groups(nodes, d => rank.get(d.id) ?? 0).sort((a,b) => a[0]-b[0]); const colW = 220; const margins = { top: 40, left: 40, right: 40, bottom: 40 }; const xForRank = r => margins.left + r * colW; const layerHeights = layered.map(([rk, arr]) => ({ rk, arr, spacing: (height - margins.top - margins.bottom) / (arr.length + 1) })); const pos = new Map(); layerHeights.forEach(({ rk, arr, spacing }) => { arr.forEach((d, i) => { const x = xForRank(rk); const y = margins.top + (i + 1) * spacing; pos.set(d.id, { x, y }); }); });
+          const pathFor = (a, b) => { const p0 = pos.get(a), p1 = pos.get(b); const mx = (p0.x + p1.x) / 2; return `M${p0.x},${p0.y} C${mx},${p0.y} ${mx},${p1.y} ${p1.x},${p1.y}`; };
+          const linkSel = linkG.selectAll('path.link').data(links.filter(e => nodeMap.has(e.source) && nodeMap.has(e.target))).enter().append('path').attr('class', 'link').attr('d', e => pathFor(e.source, e.target));
+          const defs = svg.append('defs'); defs.append('marker').attr('id', 'arrow').attr('viewBox','0 0 10 10').attr('refX',10).attr('refY',5).attr('markerWidth',6).attr('markerHeight',6).attr('orient','auto-start-reverse').append('path').attr('d','M 0 0 L 10 5 L 0 10 z').attr('fill','#888'); linkSel.attr('marker-end', 'url(#arrow)');
+          linkG.selectAll('text.edge-label').data(links).enter().append('text').attr('class','edge-label').attr('x', e => (pos.get(e.source).x + pos.get(e.target).x)/2).attr('y', e => (pos.get(e.source).y + pos.get(e.target).y)/2 - 6).text(e => edgeLabel(e.kind));
+          const nodeSel = nodeG.selectAll('g.node').data(nodes).enter().append('g').attr('class','node').attr('transform', d => `translate(${pos.get(d.id).x},${pos.get(d.id).y})`).on('mousemove', (ev, d) => { if (!pinned) showTip(d, ev); }).on('mouseleave', () => { if (!pinned) hideTip(); }).on('click', (ev, d) => pinTooltip(d, ev));
+          nodeSel.each(function(d){ const sel=d3.select(this); const fill = typeFill[d.type] || '#fff'; if (d.type==='process'){ sel.append('rect').attr('x',-16).attr('y',-16).attr('width',32).attr('height',32).attr('transform','rotate(45)').attr('fill',fill);} else if (d.type==='artifact'){ sel.append('rect').attr('x',-32).attr('y',-14).attr('width',64).attr('height',28).attr('rx',4).attr('ry',4).attr('fill',fill);} else if (d.type==='vector'){ const r=16; const points=[[0,-r],[r*0.866,-r*0.5],[r*0.866,r*0.5],[0,r],[-r*0.866,r*0.5],[-r*0.866,-r*0.5]]; sel.append('polygon').attr('points',points.map(p=>p.join(',')).join(' ')).attr('fill',fill);} else { sel.append('circle').attr('r',18).attr('fill',fill);} const text = sel.append('text').attr('class','label'); const lines = wrapLabel(d.id, 10, 2); const lineH=12; const offsetY = -((lines.length-1)*lineH)/2; lines.forEach((ln,i)=>{ text.append('tspan').attr('x',0).attr('y',offsetY + i*lineH).text(ln); }); });
+
+          function showTip(d, ev) { const html = `<div><b>${escapeHtml(d.id)}</b></div><div class="pill">${escapeHtml(d.type)}</div><div style="margin-top:4px;color:#ddd">Click for details</div>`; tip.innerHTML = html; tip.style.left = (ev.clientX + 12) + 'px'; tip.style.top = (ev.clientY + 12) + 'px'; tip.style.opacity = 1; }
+          function hideTip() { tip.style.opacity = 0; }
+          function pinTooltip(d, ev) { if (pinned && pinnedNode && pinnedNode.id === d.id) { unpinTooltip(); return; } pinned = true; pinnedNode = d; const px = ev.clientX + 12, py = ev.clientY + 12; tip.style.left = px + 'px'; tip.style.top = py + 'px'; tip.style.opacity = 1; tip.style.pointerEvents = 'auto'; const src = d.source ? `<div style="margin:6px 0 8px"><a href="${escapeHtml(d.source)}" target="_blank" rel="noopener">Open SOURCE ↗</a></div>` : '<div style="margin:6px 0 8px"><span>No source link</span></div>'; const desc = DESCRIPTIONS[d.id] || ''; tip.innerHTML = `<div style="display:flex;align-items:center;gap:8px;justify-content:space-between"><div><b>${escapeHtml(d.id)}</b> <span class="pill">${escapeHtml(d.type)}</span></div><button id="tipCloseBtn" aria-label="Close" style="border:none;background:#333;color:#fff;border-radius:12px;padding:2px 8px;cursor:pointer">×</button></div>${src}<div class="body" style="max-width:300px;line-height:1.35">${escapeHtml(desc || 'No description.')}</div>`; const btn = document.getElementById('tipCloseBtn'); if (btn) btn.onclick = (e) => { e.stopPropagation(); unpinTooltip(); }; }
+          function unpinTooltip() { pinned = false; pinnedNode = null; tip.style.opacity = 0; tip.style.pointerEvents = 'none'; }
+        }
+
+        function wrapLabel(s, maxChars, maxLines) { const words = String(s).split(/\s+/); const lines = []; let cur=''; for (const w of words) { const test = cur ? cur + ' ' + w : w; if (test.length <= maxChars) { cur = test; } else { if (cur) lines.push(cur); cur = w; if (lines.length === maxLines - 1) break; } if (lines.length === maxLines - 1 && cur.length > maxChars) break; } if (cur && lines.length < maxLines) lines.push(cur); const leftover = words.slice(lines.join(' ').split(/\s+/).length).length; if (leftover > 0 && lines.length) { const last = lines[lines.length - 1]; lines[lines.length - 1] = (last.length > 1 ? last.slice(0, Math.max(1, maxChars - 1)) : last) + '…'; } return lines.length ? lines : [String(s).slice(0, maxChars - 1) + '…']; }
+        window.addEventListener('resize', () => { const { width, height } = getSize(); svg.attr('viewBox', `0 0 ${width} ${height}`); });
+      });
+    }
+  </script>
+</body>
+</html>

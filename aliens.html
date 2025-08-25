@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Alien Franchise — Reaction Graph (A + B → C)</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      font-family: system-ui, Segoe UI, Arial
+    }
+
+    svg {
+      width: 100vw;
+      height: 100vh;
+      background: #f6f6f6;
+      display: block
+    }
+
+    .node circle {
+      stroke: #222;
+      stroke-width: 1.5;
+      vector-effect: non-scaling-stroke
+    }
+
+    .node rect {
+      stroke: #222;
+      stroke-width: 1.5;
+      vector-effect: non-scaling-stroke
+    }
+
+    .label {
+      font-size: 12px;
+      pointer-events: none;
+      text-anchor: middle;
+      dominant-baseline: middle
+    }
+
+    .edge {
+      fill: none;
+      stroke: #777;
+      stroke-width: 1.6;
+      vector-effect: non-scaling-stroke
+    }
+
+    .edge-label {
+      font-size: 11px;
+      fill: #111;
+      paint-order: stroke;
+      stroke: #fff;
+      stroke-width: 4px;
+      stroke-linejoin: round
+    }
+
+    .highlight circle,
+    .highlight rect {
+      stroke: #ff4081 !important;
+      stroke-width: 3 !important;
+    }
+
+    .edge.edge-highlight {
+      stroke: #ff4081 !important;
+      stroke-width: 2.4 !important;
+    }
+
+    .isolated circle,
+    .isolated rect {
+      stroke: #d9534f !important;
+      stroke-width: 3 !important;
+    }
+
+    .search {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 10000;
+    }
+
+    .search input {
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid #bbb;
+      background: #fff;
+      font-size: 12px;
+      width: 220px;
+    }
+
+    .legend text {
+      font-size: 12px
+    }
+
+    .tip {
+      position: fixed;
+      pointer-events: none;
+      background: #111;
+      color: #fff;
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      opacity: 0;
+      transition: opacity .12s;
+      max-width: 360px;
+      z-index: 9999;
+    }
+
+    .tip a {
+      color: #8fd3ff;
+      text-decoration: none
+    }
+
+    .pill {
+      display: inline-block;
+      border: 1px solid #888;
+      border-radius: 9999px;
+      padding: 1px 6px;
+      margin: 2px 4px 0 0;
+      font-size: 11px;
+      background: #fff;
+      color: #333
+    }
+
+    /* legend panel */
+    #legend {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 10000;
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 8px 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      max-width: 260px;
+    }
+
+    #legend:before {
+      content: "Legend";
+      display: block;
+      font-weight: 600;
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="tip" class="tip"></div>
+  <div class="search"><input id="search" type="text" placeholder="Find node… (press /)" aria-label="Find node" /></div>
+  <div id="legend" class="legend" aria-label="Legend"></div>
+  <svg id="viz"></svg>
+  <script>
+    /* ========= DATA =========
+       Type legend:
+       host, agent, vector, artifact, stage, species, organism, hybrid, process, meta
+    */
+    const nodes = [
+      // Hosts
+      n("Human", "host", {
+        seen: ["Alien (1979)", "Aliens (1986)", "Alien 3 (1992)", "Alien Resurrection (1997)", "Prometheus (2012)", "Alien: Covenant (2017)", "Alien: Romulus (2024)"], src: [
+          s("Xenomorph — Life cycle (Wikipedia)", "https://en.wikipedia.org/wiki/Xenomorph"),
+        ]
+      }),
+      n("Dog", "host", { seen: ["Alien 3 (1992)"], src: [s("Xenomorph — dog host (Wikipedia)", "https://en.wikipedia.org/wiki/Xenomorph#Life_cycle_and_physiology")] }),
+      n("Ox", "host", { seen: ["Alien 3 (1992, Assembly Cut)"], src: [s("Xenomorph — ox host (Wikipedia)", "https://en.wikipedia.org/wiki/Xenomorph#Life_cycle_and_physiology")] }),
+      n("Cat", "host", {
+        seen: ["Alien: Earth (2025)"], src: [
+          s("Alien: Earth (Alien Anthology)", "https://alienanthology.fandom.com/wiki/Alien:_Earth")
+        ]
+      }),
+      // Removed AVP crossover: Predator (Yautja)
+      n("Engineer", "host", { seen: ["Prometheus (2012)"], src: [s("Engineer (Alien Anthology)", "https://alienanthology.fandom.com/wiki/Engineer")] }),
+      n("Pregnant Human", "host", {
+        seen: ["Alien: Romulus (2024)"], src: [
+          s("Alien: Romulus (Alien Anthology)", "https://alienanthology.fandom.com/wiki/Alien:_Romulus")
+        ]
+      }),
+
+      // Pathogen / vectors / artifacts
+      n("Black Goo", "agent", {
+        seen: ["Prometheus (2012)", "Alien: Covenant (2017)"], src: [
+          s("Chemical A0-3959X.91–15 (Alien Anthology)", "https://alienanthology.fandom.com/wiki/Chemical_A0-3959X.91_%E2%80%93_15")
+        ]
+      }),
+      n("Pods (contaminated)", "artifact", {
+        seen: ["Alien: Covenant (2017)"], src: [
+          s("Alien: Covenant (Alien Anthology)", "https://alienanthology.fandom.com/wiki/Alien:_Covenant")
+        ]
+      }),
+      n("Spores / Motes", "vector", {
+        seen: ["Alien: Covenant (2017)"], src: [
+          s("Alien: Covenant (Alien Anthology)", "https://alienanthology.fandom.com/wiki/Alien:_Covenant")
+        ]
+      }),
+      n("Egg (Ovomorph)", "artifact", {
+        seen: ["Alien (1979)", "Aliens (1986)"], src: [
+          s("Ovomorph (Alien Anthology)", "https://alienanthology.fandom.com/wiki/Ovomorph")
+        ]
+      }),
+      n("Cocooned Victim", "artifact", {
+        seen: ["Alien (1979, deleted scene / Director’s Cut)"], src: [
+          s("Egg morphing concept (Wikipedia)", "https://en.wikipedia.org/wiki/Xenomorph#Egg")
+        ]
+      }),
+
+      // Stages / organisms / species
+      n("Facehugger", "stage", {
+        seen: ["Alien (1979)", "Aliens (1986)"], src: [
+          s("Facehugger (Alien Anthology)", "https://alienanthology.fandom.com/wiki/Facehugger")
+        ]
+      }),
+      n("Royal Facehugger", "stage", {
+        seen: ["Alien³ (Special Edition)/Extended lore"], src: [
+          s("Facehugger (Royal variant noted)", "https://alienanthology.fandom.com/wiki/Facehugger")
+        ]
+      }),
+      n("Chestburster", "stage", {
+        seen: ["All films"], src: [
+          s("Chestburster (Alien Anthology)", "https://alienanthology.fandom.com/wiki/Chestburster")
+        ]
+      }),
+      n("Drone", "species", {
+        seen: ["Alien (1979)"], src: [
+          s("Drone (Alien Anthology)", "https://alienanthology.fandom.com/wiki/Drone")
+        ]
+      }),
+      n("Warrior", "species", {
+        seen: ["Aliens (1986)"], src: [
+          s("Soldier (Aliens variant, Alien Anthology)", "https://alienanthology.fandom.com/wiki/Soldier")
+        ]
+      }),
+      n("Runner", "species", {
+        seen: ["Alien 3 (1992)"], src: [
+          s("Runner (Alien Anthology)", "https://alienanthology.fandom.com/wiki/Runner")
+        ]
+      }),
+      n("Praetorian", "stage", {
+        seen: ["Games/Comics; royal jelly concept"], src: [
+          s("Royal Guard (related concept, Alien Anthology)", "https://alienanthology.fandom.com/wiki/Royal_Guard")
+        ]
+      }),
+      n("Queen", "species", {
+        seen: ["Aliens (1986)"], src: [
+          s("Queen (Alien Anthology)", "https://alienanthology.fandom.com/wiki/Queen")
+        ]
+      }),
+      // Distinct cloned/modified queen variant used in Alien Resurrection
+      n("Cloned Queen (human DNA)", "species", {
+        seen: ["Alien Resurrection (1997)"], src: [
+          s("Alien: Resurrection (Alien Anthology)", "https://alienanthology.fandom.com/wiki/Alien:_Resurrection"),
+          s("The Newborn (Alien Anthology)", "https://alienanthology.fandom.com/wiki/The_Newborn")
+        ]
+      }),
+      // Removed AVP crossover: Predalien hybrid
+      n("Newborn", "hybrid", {
+        seen: ["Alien Resurrection (1997)"], src: [
+          s("The Newborn (Alien Anthology)", "https://alienanthology.fandom.com/wiki/The_Newborn")
+        ]
+      }),
+      n("Trilobite", "organism", {
+        seen: ["Prometheus (2012)"], src: [
+          s("The Trilobite (Alien Anthology)", "https://alienanthology.fandom.com/wiki/The_Trilobite")
+        ]
+      }),
+      n("Deacon", "species", {
+        seen: ["Prometheus (2012)"], src: [
+          s("The Deacon (Alien Anthology)", "https://alienanthology.fandom.com/wiki/The_Deacon")
+        ]
+      }),
+      n("Bloodburster", "stage", {
+        seen: ["Alien: Covenant (2017)"], src: [
+          s("Alien: Covenant (Alien Anthology)", "https://alienanthology.fandom.com/wiki/Alien:_Covenant")
+        ]
+      }),
+      n("Neomorph", "species", {
+        seen: ["Alien: Covenant (2017)"], src: [
+          s("Neomorph (AVP Fandom)", "https://avp.fandom.com/wiki/Neomorph")
+        ]
+      }),
+      n("Protomorph", "species", {
+        seen: ["Covenant concept / David experiments"], src: [
+          s("Protomorph (Alien Anthology)", "https://alienanthology.fandom.com/wiki/Protomorph")
+        ]
+      }),
+  n("Offspring", "hybrid", {
+        seen: ["Alien: Romulus (2024)"], src: [
+          s("Alien: Romulus (Alien Anthology)", "https://alienanthology.fandom.com/wiki/Alien:_Romulus")
+        ]
+      }),
+      // Alien: Earth (2025) — new extraterrestrial organisms
+      n("Trypanohyncha Ocellus", "species", {
+        seen: ["Alien: Earth (2025)"],
+        notes: "Parasitical creature with multiple irises and strong tentacles; enters the ocular cavity, replaces the eye, and hijacks the host's neural pathways, mimicking the host iris.",
+        src: [
+          s("Trypanohyncha Ocellus (Alien Anthology)", "https://alienanthology.fandom.com/wiki/Trypanohyncha_Ocellus"),
+          s("Alien: Earth (Alien Anthology)", "https://alienanthology.fandom.com/wiki/Alien:_Earth")
+        ]
+      }),
+      n("Ocellus-controlled Host", "organism", {
+        seen: ["Alien: Earth (2025)"],
+        notes: "Host whose ocular pathways and motor control are overridden after Trypanohyncha Ocellus replaces the eye.",
+        src: [
+          s("Trypanohyncha Ocellus (Alien Anthology)", "https://alienanthology.fandom.com/wiki/Trypanohyncha_Ocellus")
+        ]
+      }),
+      n("Unidentified Leech Species", "species", {
+        seen: ["Alien: Earth (2025)"],
+        notes: "Leech-like extraterrestrial organism observed post-crash; attaches parasitically to hosts (details emerging).",
+        src: [
+          s("Unidentified Leech Species (AVP Fandom)", "https://avp.fandom.com/wiki/Unidentified_Leech_Species"),
+          s("Alien: Earth (Alien Anthology)", "https://alienanthology.fandom.com/wiki/Alien:_Earth")
+        ]
+      }),
+      n("Leech-parasitized Host", "organism", {
+        seen: ["Alien: Earth (2025)"],
+        notes: "Host with leech-like organism attached; parasitic dependence suspected.",
+        src: [
+          s("Alien: Earth (Alien Anthology)", "https://alienanthology.fandom.com/wiki/Alien:_Earth")
+        ]
+      }),
+      // Gestational intermediate occasionally described as a tadpole-like implanted organism
+      n("Tadpole-like larva (P. praepotens)", "stage", {
+        seen: ["Alien: Earth (2025)", "Behind-the-scenes anatomy"],
+        notes: "Curated: a tadpole-like implanted stage delivered by the Facehugger; an anatomical detail usually not shown on-screen, representing a pre-chestburster state.",
+        src: [
+          s("Facehugger (Alien Anthology)", "https://alienanthology.fandom.com/wiki/Facehugger"),
+          s("Anatomy detail: Facehugger injects tadpole (ScreenRant)", "https://screenrant.com/alien-earth-facehuggers-dissect-anatomy-tadpole-detail/")
+        ]
+      }),
+      // Additional Alien: Earth species
+      n("D. Plumbicare", "species", {
+        seen: ["Alien: Earth (2025)"], src: [
+          s("D. Plumbicare (Alien Anthology)", "https://alienanthology.fandom.com/wiki/D._Plumbicare")
+        ]
+      }),
+      // Missing intermediate state used in links
+      n("Infected Human", "organism", {
+        notes: "Intermediate state after Black Goo exposure", src: [
+          s("Chemical A0-3959X.91–15 (Alien Anthology)", "https://alienanthology.fandom.com/wiki/Chemical_A0-3959X.91_%E2%80%93_15")
+        ]
+      })
+    ];
+
+    // Processes (diamonds) that implement A + B → C
+    const procs = [
+      p("Egg Morphing", "Cocooning"),
+      p("Lay Egg", "Reproduction"),
+      p("Hatch Normal", "Maturation"),
+      p("Hatch Royal", "Maturation"),
+      p("Implantation: Facehugger + Human", "Implantation"),
+      p("Implantation: Facehugger + Dog", "Implantation"),
+      p("Implantation: Facehugger + Ox", "Implantation"),
+      p("Royal Implantation (Queen embryo)", "Implantation"),
+      // Gestational intermediate prior to chestburster (curated)
+      p("Facehugger injects tadpole-like larva", "Injection/Gestation"),
+      p("Mature (Human host)", "Maturation"),
+      p("Mature (Quadruped host)", "Maturation"),
+      p("Evolve: Drone → Praetorian", "Royal Jelly"),
+      p("Evolve: Praetorian → Queen", "Molting"),
+      p("Black Goo + Human", "Infection"),
+      p("Black Goo + Ecosystem", "Contamination"),
+      p("Pods release Spores", "Release"),
+      p("Spores infect Human", "Infection"),
+      p("Bloodburster → Neomorph", "Maturation"),
+      p("Infected Human → Trilobite", "Parasitic outcome"),
+    // (chain uses specific process node: Infected Human → Trilobite)
+      p("Trilobite + Engineer", "Impregnation"),
+      p("Experimental line", "Experiment"),
+      p("Cloning (Resurrection)", "Cloning"),
+      p("Queen live birth (clone context)", "Anomalous")
+      ,
+      // Alien: Earth parasitism mechanics
+      p("Ocellus ocular takeover", "Parasitism"),
+      p("Leech attachment", "Parasitism")
+    ];
+
+    // Build links for processes
+    const links = [
+  // Baseline Xeno life cycle
+      L("Queen", "Lay Egg", "reproduction"),
+      L("Lay Egg", "Egg (Ovomorph)", "reproduction"),
+
+      L("Egg (Ovomorph)", "Hatch Normal", "maturation"),
+      L("Hatch Normal", "Facehugger", "maturation"),
+
+      L("Egg (Ovomorph)", "Hatch Royal", "maturation"),
+      L("Hatch Royal", "Royal Facehugger", "maturation"),
+
+      // Royal facehugger → Queen embryo
+      L("Royal Facehugger", "Royal Implantation (Queen embryo)", "implantation"),
+      L("Human", "Royal Implantation (Queen embryo)", "host"),
+      L("Royal Implantation (Queen embryo)", "Chestburster", "implantation"),
+      L("Chestburster", "Queen", "maturation"),
+
+      // Normal Facehugger hosts → Chestburster → adults
+      L("Facehugger", "Implantation: Facehugger + Human", "implantation"),
+      L("Human", "Implantation: Facehugger + Human", "host"),
+      // Curated gestational step between implantation and chestburster
+      L("Implantation: Facehugger + Human", "Facehugger injects tadpole-like larva", "gestation"),
+      L("Facehugger injects tadpole-like larva", "Tadpole-like larva (P. praepotens)", "gestation"),
+      L("Tadpole-like larva (P. praepotens)", "Chestburster", "maturation"),
+      L("Chestburster", "Mature (Human host)", "maturation"),
+      L("Mature (Human host)", "Drone", "maturation"),
+      L("Mature (Human host)", "Warrior", "maturation"),
+
+      L("Facehugger", "Implantation: Facehugger + Dog", "implantation"),
+      L("Dog", "Implantation: Facehugger + Dog", "host"),
+      L("Implantation: Facehugger + Dog", "Chestburster", "implantation"),
+      L("Chestburster", "Mature (Quadruped host)", "maturation"),
+      // result same morphology as Runner; keep as note
+      L("Mature (Quadruped host)", "Runner", "maturation"),
+      // Ox implantation path (Assembly Cut): mirror of quadruped host
+      L("Facehugger", "Implantation: Facehugger + Ox", "implantation"),
+      L("Ox", "Implantation: Facehugger + Ox", "host"),
+      L("Implantation: Facehugger + Ox", "Chestburster", "implantation"),
+      // explicit host-context link to visibly tie Ox to the quadruped maturation path
+      L("Ox", "Mature (Quadruped host)", "host"),
+
+      // Predator host → Predalien
+      // Removed AVP crossover links
+
+      // Drone → Praetorian → Queen (royal jelly / molting concepts)
+      L("Drone", "Evolve: Drone → Praetorian", "evolution"),
+      L("Evolve: Drone → Praetorian", "Praetorian", "evolution"),
+      L("Praetorian", "Evolve: Praetorian → Queen", "evolution"),
+      L("Evolve: Praetorian → Queen", "Queen", "evolution"),
+
+      // Predalien direct implantation into pregnant humans → multiple chestbursters
+      // Removed AVP crossover links
+
+      // Egg morphing alternative (Alien 1979 deleted scene / DC)
+      L("Drone", "Egg Morphing", "biogenesis"),
+      L("Cocooned Victim", "Egg Morphing", "biogenesis"),
+      L("Egg Morphing", "Egg (Ovomorph)", "biogenesis"),
+
+      // Black Goo pathways (Prometheus / Covenant)
+      L("Black Goo", "Black Goo + Human", "infection"),
+      L("Human", "Black Goo + Human", "host"),
+      L("Black Goo + Human", "Infected Human", "infection"),
+  // Indirect transfer path leading to rapid pregnancy and Trilobite
+  // Route through explicit process node: Infected Human → Trilobite
+  L("Infected Human", "Infected Human → Trilobite", "transmission"),
+  L("Infected Human → Trilobite", "Trilobite", "parasite"),
+      L("Trilobite", "Trilobite + Engineer", "impregnation"),
+      L("Engineer", "Trilobite + Engineer", "host"),
+      L("Trilobite + Engineer", "Deacon", "reproduction"),
+
+      L("Black Goo", "Black Goo + Ecosystem", "contaminate"),
+      L("Black Goo + Ecosystem", "Pods (contaminated)", "contaminate"),
+      L("Pods (contaminated)", "Pods release Spores", "release"),
+      L("Pods release Spores", "Spores / Motes", "release"),
+      L("Spores / Motes", "Spores infect Human", "infection"),
+      L("Human", "Spores infect Human", "host"),
+      L("Spores infect Human", "Bloodburster", "infection"),
+      L("Bloodburster", "Bloodburster → Neomorph", "maturation"),
+      L("Bloodburster → Neomorph", "Neomorph", "maturation"),
+
+      // Experimental / Protomorph notions
+      L("Black Goo", "Experimental line", "experiment"),
+      L("Experimental line", "Protomorph", "experiment"),
+
+      // Cloning path: Queen DNA + Human DNA -> Cloned Queen (human DNA) -> Newborn via anomalous live birth
+      L("Queen", "Cloning (Resurrection)", "cloning"),
+      L("Human", "Cloning (Resurrection)", "cloning"),
+      L("Cloning (Resurrection)", "Cloned Queen (human DNA)", "cloning"),
+      L("Cloned Queen (human DNA)", "Queen live birth (clone context)", "anomalous"),
+      L("Queen live birth (clone context)", "Newborn", "anomalous"),
+
+      // Romulus “Offspring” (goo + pregnant human context)
+      L("Black Goo", "Experimental line", "experiment"),
+      L("Pregnant Human", "Experimental line", "host"),
+      L("Experimental line", "Offspring", "result")
+
+      ,
+      // Alien: Earth — ocular parasite takeover
+      L("Trypanohyncha Ocellus", "Ocellus ocular takeover", "parasitism"),
+      L("Human", "Ocellus ocular takeover", "host"),
+      L("Cat", "Ocellus ocular takeover", "host"),
+      L("Ocellus ocular takeover", "Ocellus-controlled Host", "parasite"),
+
+      // Alien: Earth — space leech parasitism
+      L("Unidentified Leech Species", "Leech attachment", "parasitism"),
+      L("Human", "Leech attachment", "host"),
+      L("Leech attachment", "Leech-parasitized Host", "parasite")
+    ];
+
+    /* ========= VISUALIZATION ========= */
+    const color = {
+      host: "#ffcc66",
+      agent: "#d27d2d",
+      vector: "#c678dd",
+      artifact: "#7aa2f7",
+      stage: "#98c379",
+      species: "#5fb3b3",
+      organism: "#e5c07b",
+      hybrid: "#e06c75",
+      meta: "#C9D1D9",
+      process: "#b3b3b3"
+    };
+
+    const R = 18;       // entity radius
+    const RP = 13;      // process diamond half-size
+
+    // Build indexable node map and enrich process nodes
+    const nodeMap = new Map();
+    const trimId = s => (typeof s === 'string' ? s.trim() : s);
+    nodes.forEach(d => { nodeMap.set(d.id, d); const t = trimId(d.id); if (t !== d.id) nodeMap.set(t, d); });
+    procs.forEach(d => {
+      if (d && d.id) {
+        nodeMap.set(d.id, d);
+        const t = trimId(d.id); if (t !== d.id) nodeMap.set(t, d);
+        // ensure process nodes are part of the simulation and rendering
+        nodes.push(d);
+      } else {
+        console.warn("Malformed process node:", d);
+      }
+    });
+
+    links.forEach(e => {
+      const s = nodeMap.get(e.source) || nodeMap.get(trimId(e.source));
+      const t = nodeMap.get(e.target) || nodeMap.get(trimId(e.target));
+      if (!s || !t) {
+        console.warn("Link refers to unknown node:", e);
+      } else {
+        e.source = s.id;
+        e.target = t.id;
+      }
+    });
+
+    // Validation: log isolated nodes (no incident edges)
+    (function validateGraph() {
+      const deg = new Map();
+      nodes.forEach(n => deg.set(n.id, 0));
+      links.forEach(l => {
+        const sid = typeof l.source === 'object' ? l.source.id : l.source;
+        const tid = typeof l.target === 'object' ? l.target.id : l.target;
+        if (deg.has(sid)) deg.set(sid, deg.get(sid) + 1);
+        if (deg.has(tid)) deg.set(tid, deg.get(tid) + 1);
+      });
+      const isolated = nodes.filter(n => deg.get(n.id) === 0).map(n => n.id);
+      if (isolated.length) console.warn('Isolated nodes:', isolated);
+    })();
+
+    const svg = d3.select("#viz");
+    const g = svg.append("g");
+    const tip = document.getElementById("tip");
+    const searchInput = document.getElementById("search");
+    const legendEl = document.getElementById("legend");
+    let lockedTip = false;
+
+    // zoom/pan
+    const zoom = d3.zoom().scaleExtent([0.25, 4]).on("zoom", ({ transform }) => g.attr("transform", transform));
+    svg.call(zoom);
+
+    // defs for arrows
+    const defs = svg.append("defs");
+    defs.append("marker").attr("id", "arrow").attr("viewBox", "0 -5 10 10")
+      .attr("refX", 12).attr("refY", 0).attr("markerWidth", 8).attr("markerHeight", 8).attr("orient", "auto")
+      .append("path").attr("d", "M0,-5L10,0L0,5").attr("fill", "#777");
+
+    // forces
+    const sim = d3.forceSimulation(nodes)
+      .force("link", d3.forceLink(links)
+        .id(d => d.id)
+        .distance(l => {
+          const endpointType = v => (v && typeof v === "object") ? v.type : (nodeMap.get(v) ? nodeMap.get(v).type : undefined);
+          const st = endpointType(l.source);
+          const tt = endpointType(l.target);
+          // Give more room overall; process-involved links slightly shorter to keep diamonds close to their context
+          return (st === "process" || tt === "process") ? 100 : 140;
+        })
+        .strength(0.55))
+      .force("charge", d3.forceManyBody().strength(-600).distanceMin(20).distanceMax(800))
+      .force("collide", d3.forceCollide()
+        .radius(d => d.type === "process" ? RP * 1.9 : R * 1.9)
+        .iterations(2))
+      .force("center", d3.forceCenter(window.innerWidth / 2, window.innerHeight / 2))
+      .velocityDecay(0.35);
+
+    // draw edges
+    const linkG = g.append("g").attr("stroke-linecap", "round");
+    const link = linkG.selectAll("path.edge")
+      .data(links)
+      .enter().append("path")
+      .attr("class", "edge")
+      .attr("marker-end", "url(#arrow)");
+
+    // edge labels
+    const linkLabel = linkG.selectAll("text.edge-label")
+      .data(links)
+      .enter().append("text")
+      .attr("class", "edge-label")
+      .attr("text-anchor", "middle")
+      .text(d => labelForEdge(d.kind));
+
+    // draw nodes
+    const nodeG = g.append("g");
+    const node = nodeG.selectAll(".node")
+      .data(nodes)
+      .enter().append("g")
+      .attr("class", "node")
+      .call(drag(sim))
+      .on("mousemove", (evt, d) => { if (!lockedTip) showTip(d, evt); })
+      .on("mouseleave", () => { if (!lockedTip) hideTip(); })
+      .on("click", (evt, d) => {
+        // toggle lock: allow clicking links inside tooltip
+        lockedTip = !lockedTip;
+        if (lockedTip) {
+          showTip(d, evt);
+          tip.style.pointerEvents = 'auto';
+        } else {
+          hideTip();
+          tip.style.pointerEvents = 'none';
+        }
+        evt.stopPropagation();
+      });
+
+    // clicking empty space unlocks tooltip
+    svg.on("click", () => { if (lockedTip) { lockedTip = false; hideTip(); tip.style.pointerEvents = 'none'; } });
+
+    // shapes
+    node.each(function (d) {
+      const sel = d3.select(this);
+      if (d.type === "process") {
+        sel.append("rect")
+          .attr("x", -RP).attr("y", -RP).attr("width", RP * 2).attr("height", RP * 2)
+          .attr("transform", "rotate(45)")
+          .attr("fill", color.process);
+        sel.append("text").attr("class", "label").attr("dy", 28).text(d.id);
+      } else {
+        sel.append("circle").attr("r", R).attr("fill", color[d.type] || "#bbb");
+        sel.append("text").attr("class", "label").attr("dy", -28).text(d.id);
+      }
+    });
+
+    // tick
+    sim.on("tick", () => {
+      link.attr("d", d => curved(d));
+      linkLabel.attr("x", d => (d.source.x + d.target.x) / 2)
+        .attr("y", d => (d.source.y + d.target.y) / 2 - 6);
+      node.attr("transform", d => `translate(${d.x},${d.y})`);
+    });
+
+    // Build legend from color map (circle for entities, diamond for process)
+    function drawLegend() {
+      if (!legendEl) return;
+      const order = ["host", "agent", "vector", "artifact", "stage", "species", "organism", "hybrid", "process", "meta"];
+      // Collect types actually present and known to the color map
+      const used = new Set(nodes.filter(n => n && n.type && color[n.type]).map(n => n.type));
+      let keys = order.filter(k => used.has(k) && color[k]);
+      // Fallback: if nothing detected (e.g., timing), show full legend
+      if (!keys.length) {
+        console.warn("Legend fallback: no used categories detected; showing all known types.");
+        keys = order.filter(k => color[k]);
+      }
+      const entries = keys.map(k => ({ key: k, fill: color[k] }));
+      const wrap = document.createElement("div");
+      wrap.style.display = "grid";
+      wrap.style.gridTemplateColumns = "1fr 1fr";
+      wrap.style.gap = "6px 14px";
+      entries.forEach(({ key, fill }) => {
+        const row = document.createElement("div");
+        row.style.display = "flex"; row.style.alignItems = "center"; row.style.gap = "8px";
+        const icon = document.createElement("span");
+        icon.style.display = "inline-block";
+        icon.style.width = "14px";
+        icon.style.height = "14px";
+        icon.style.background = fill;
+        icon.style.border = "1.5px solid #222";
+        if (key === "process") {
+          icon.style.borderRadius = "2px";
+          icon.style.transform = "rotate(45deg)";
+        } else {
+          icon.style.borderRadius = "9999px";
+        }
+        const label = document.createElement("span");
+        label.textContent = key;
+        label.style.fontSize = "12px";
+        row.appendChild(icon); row.appendChild(label);
+        wrap.appendChild(row);
+      });
+      legendEl.innerHTML = "";
+      if (!entries.length) {
+        const empty = document.createElement("div");
+        empty.textContent = "No categories";
+        empty.style.fontSize = "12px";
+        empty.style.color = "#555";
+        legendEl.appendChild(empty);
+      } else {
+        legendEl.appendChild(wrap);
+      }
+    }
+    // Draw now and once more on next frame to avoid any timing quirks
+    drawLegend();
+    requestAnimationFrame(drawLegend);
+
+    // search/highlight and focus
+    function runSearch(q) {
+      const query = (q || "").trim().toLowerCase();
+      const ids = new Set();
+      if (query) {
+        nodes.forEach(n => { if ((n.id || "").toLowerCase().includes(query)) ids.add(n.id); });
+      }
+      node.classed("highlight", d => ids.has(d.id));
+      link.classed("edge-highlight", d => ids.has(typeof d.source === 'object' ? d.source.id : d.source) || ids.has(typeof d.target === 'object' ? d.target.id : d.target));
+      // if single match, center it
+      if (ids.size === 1) {
+        const id = Array.from(ids)[0];
+        const d = nodes.find(n => n.id === id);
+        if (d && Number.isFinite(d.x) && Number.isFinite(d.y)) centerOn(d);
+      }
+    }
+
+    function centerOn(d) {
+      const k = 1.6;
+      const t = d3.zoomIdentity.translate(window.innerWidth / 2, window.innerHeight / 2).scale(k).translate(-d.x, -d.y);
+      svg.transition().duration(600).call(zoom.transform, t);
+    }
+
+    // input handlers
+    searchInput.addEventListener('input', (e) => runSearch(e.target.value));
+    window.addEventListener('keydown', (e) => {
+      if (e.key === '/') {
+        e.preventDefault();
+        searchInput.focus();
+        searchInput.select();
+      } else if (e.key === 'Enter' && document.activeElement === searchInput) {
+        runSearch(searchInput.value);
+      }
+    });
+
+
+    // helpers
+    function curved(d) {
+      const sx = d.source.x, sy = d.source.y, tx = d.target.x, ty = d.target.y;
+      const cx = (sx + tx) / 2, cy = (sy + ty) / 2 - 12; // slight curve
+      return `M${sx},${sy} Q${cx},${cy} ${tx},${ty}`;
+    }
+    function drag(sim) {
+      function dragstarted(event, d) { if (!event.active) sim.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; }
+      function dragged(event, d) { d.fx = event.x; d.fy = event.y; }
+      function dragended(event, d) { if (!event.active) sim.alphaTarget(0); d.fx = null; d.fy = null; }
+      return d3.drag().on("start", dragstarted).on("drag", dragged).on("end", dragended);
+    }
+
+    function labelForEdge(kind) {
+      const map = {
+        reproduction: "lays/produces", maturation: "matures", implantation: "implants",
+        host: "host", evolution: "evolves", infection: "infects", contaminate: "contaminates",
+        release: "releases", parasite: "parasitic outcome", biogenesis: "forms egg",
+        experiment: "experiment", anomalous: "anomalous birth", origin: "origin", impregnation: "impregnates", result: "result", transmission: "transmission", cloning: "cloning",
+        gestation: "gestates", parasitism: "parasitizes"
+      };
+      return map[kind] || kind;
+    }
+
+    function showTip(d, evt) {
+      const html = `
+    <div><b>${d.id}</b></div>
+    <div class="pill">${d.type}</div>
+    ${d.notes ? `<div style="margin-top:6px">${d.notes}</div>` : ""}
+    ${d.seen ? `<div style="margin-top:6px"><b>Seen in:</b> ${d.seen.map(x => `<span class="pill">${escapeHtml(x)}</span>`).join(" ")}</div>` : ""}
+    ${d.src ? `<div style=\"margin-top:6px\"><b>Sources:</b><br>${d.src.map(x => `<a href="${x.url}" target="_blank" rel="noopener">${escapeHtml(x.title)}</a>`).join("<br>")}</div>` : ""}
+  `;
+      tip.innerHTML = html;
+      tip.style.left = (evt.clientX + 14) + "px";
+      tip.style.top = (evt.clientY + 14) + "px";
+      tip.style.opacity = 1;
+      tip.style.pointerEvents = lockedTip ? 'auto' : 'none';
+    }
+    function hideTip() { tip.style.opacity = 0; }
+
+    function n(id, type, extra = {}) { return Object.assign({ id, type }, extra); }
+    function p(id, label) { return { id, label, type: "process" }; }
+    function L(a, b, kind) { return { source: a, target: b, kind }; }
+    function s(title, url) { return { title, url }; }
+    function escapeHtml(s) { return s.replace(/[&<>\"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": "&#39;" }[c])); }
+
+    // resize handling
+    window.addEventListener("resize", () => sim.force("center", d3.forceCenter(window.innerWidth / 2, window.innerHeight / 2)));
+  </script>
+</body>
+
+</html>
