@@ -26,11 +26,16 @@
     .label { font-size: 12px; pointer-events: none; text-anchor: middle; dominant-baseline: middle }
     .highlight circle, .highlight rect { stroke: #ff4081 !important; stroke-width: 3 !important; }
     .edge.edge-highlight { stroke: #ff4081 !important; stroke-width: 2.4 !important; }
-    /* DAG styles */
-    .dag-topbar { display: flex; gap: 12px; align-items: center; padding: 10px 12px; border-bottom: 1px solid #e5e5e5; position: sticky; top: 46px; background: #fff; z-index: 2; }
+  /* DAG styles */
+  .dag-topbar { display: flex; gap: 12px; align-items: center; padding: 10px 12px; border-bottom: 1px solid #e5e5e5; position: sticky; top: 0; background: #fff; z-index: 2; }
     .dag-wrap { height: calc(100% - 52px); }
     .dag-wrap svg { width: 100%; height: 100%; display: block; background: #fff; }
     .edge-label { font-size: 11px; fill: #111; paint-order: stroke fill; stroke: #fff; stroke-width: 2px; }
+  .link { fill: none; stroke: #888; stroke-width: 1.4; }
+  .link.back { stroke-dasharray: 4 3; stroke: #aaa; }
+  .notice { color: #b00; font-size: 12px; }
+  /* Label styling with white halo for readability (DAG) */
+  .node .label { font-size: 12px; font-weight: 600; dominant-baseline: middle; text-anchor: middle; paint-order: stroke fill; stroke: #fff; stroke-width: 3px; fill: #111; -webkit-user-select: none; user-select: none; }
   </style>
   <noscript>
     <style>.panels { display: none; }</style>
@@ -52,9 +57,9 @@
     <div id="panel-dag" class="panel" role="tabpanel" aria-labelledby="tab-dag">
       <div class="dag-topbar">
         <div class="title">Alien Franchise — DAG</div>
-        <label for="dagRootSel">Root:</label>
-        <select id="dagRootSel" aria-label="Choose root"></select>
-        <div id="dagStatus" style="color:#b00;font-size:12px"></div>
+  <label for="dagRootSel">Root:</label>
+  <select id="dagRootSel" aria-label="Choose root"></select>
+  <div id="dagStatus" class="notice"></div>
       </div>
       <div class="dag-wrap">
         <svg id="dagSvg"></svg>
@@ -73,117 +78,108 @@
       let inited = new Set();
       function select(hash) {
         const target = TABS.find(t => t.hash === hash) || TABS[0];
-        TABS.forEach(t => {
-          const active = (t === target);
-          t.btn.setAttribute('aria-selected', String(active));
-          t.panel.classList.toggle('active', active);
-        });
-        try { localStorage.setItem('aliens-tabs-active', target.hash); } catch (_) {}
-        if (location.hash !== target.hash) { history.replaceState(null, '', target.hash); }
-        if (!inited.has(target.hash)) { inited.add(target.hash); target.init(); }
-      }
-      TABS.forEach(t => t.btn.addEventListener('click', () => select(t.hash)));
-      const initial = location.hash || (function(){ try { return localStorage.getItem('aliens-tabs-active'); } catch (_) { return null; } })() || '#reaction';
-      select(initial);
-    })();
+        function initDagOnce() {
+          const svg = d3.select('#dagSvg');
+          const g = svg.append('g');
+          // Helpers
+          function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 
-    // ========= Reaction Graph (loads reaction.json) =========
-    function initReactionOnce() {
-      const svg = d3.select('#reactionSvg');
-      const g = svg.append('g');
-      const tip = document.body.appendChild(Object.assign(document.createElement('div'), { className: 'tip' }));
-      const legendEl = document.getElementById('reactionLegend');
-      const searchInput = document.getElementById('reactionSearch');
+          // Tab controller
+          (function () {
+            const TABS = [
+              { btn: document.getElementById('tab-reaction'), panel: document.getElementById('panel-reaction'), hash: '#reaction', init: initReactionOnce },
+              { btn: document.getElementById('tab-dag'), panel: document.getElementById('panel-dag'), hash: '#dag', init: initDagOnce },
+            ];
+            const inited = new Set();
+            function activate(tab) {
+              TABS.forEach(t => {
+                const on = t === tab;
+                t.btn.setAttribute('aria-selected', on ? 'true' : 'false');
+                t.panel.classList.toggle('active', on);
+              });
+              history.replaceState(null, '', tab.hash);
+              if (!inited.has(tab.hash)) { tab.init(); inited.add(tab.hash); }
+            }
+            TABS.forEach(tab => tab.btn.addEventListener('click', () => activate(tab)));
+            const start = TABS.find(t => t.hash === location.hash) || TABS[0];
+            activate(start);
+          })();
 
-      const color = { host: '#ffcc66', agent: '#d27d2d', vector: '#c678dd', artifact: '#7aa2f7', stage: '#98c379', species: '#5fb3b3', organism: '#e5c07b', hybrid: '#e06c75', meta: '#C9D1D9', process: '#b3b3b3' };
-      const R = 18, RP = 13;
-      let lockedTip = false;
+          // ========= Reaction Graph (minimal, loads reaction.json) =========
+          function initReactionOnce() {
+            const svg = d3.select('#reactionSvg');
+            const legendEl = document.getElementById('reactionLegend');
+            const searchInput = document.getElementById('reactionSearch');
+            const g = svg.append('g');
+            const linkG = g.append('g');
+            const nodeG = g.append('g');
+            const tip = document.createElement('div');
+            tip.className = 'tip';
+            document.body.appendChild(tip);
+            const zoom = d3.zoom().scaleExtent([0.4, 2.5]).on('zoom', (ev) => { g.attr('transform', ev.transform); });
+            svg.call(zoom);
 
-      const zoom = d3.zoom().scaleExtent([0.25, 4]).on('zoom', ({ transform }) => g.attr('transform', transform));
-      svg.call(zoom);
+            const color = { host: '#e7f1ff', agent: '#efefef', vector: '#fff0c2', artifact: '#fff7db', stage: '#f3f6f9', species: '#e9f7ef', organism: '#f1f8ff', hybrid: '#f9e6ef', process: '#fbecff', meta: '#f0f0f0' };
+            const R = 16, RP = 14;
 
-      const defs = svg.append('defs');
-      defs.append('marker').attr('id', 'arrow').attr('viewBox', '0 -5 10 10')
-        .attr('refX', 12).attr('refY', 0).attr('markerWidth', 8).attr('markerHeight', 8).attr('orient', 'auto')
-        .append('path').attr('d', 'M0,-5L10,0L0,5').attr('fill', '#777');
+            fetch('reaction.json').then(r => r.json()).then(data => {
+              const procNodes = (data.processes || []).map(p => ({ id: p.id || p, type: 'process' }));
+              const nodes = [...(data.nodes || []), ...procNodes];
+              const nodeMap = new Map(nodes.map(n => [n.id, n]));
+              const links = (data.links || []).filter(e => nodeMap.has(e.source) && nodeMap.has(e.target)).map(e => ({ source: e.source, target: e.target, kind: e.kind }));
 
-      fetch('reaction.json').then(r => r.json()).then(data => {
-        const nodes = [...(data.nodes||[])];
-        const procs = (data.processes||[]).map(p => ({ ...p, type: 'process' }));
-        nodes.push(...procs);
-        const links = (data.links||[]).map(e => ({ ...e }));
+              const sim = d3.forceSimulation(nodes)
+                .force('link', d3.forceLink(links).id(d => d.id).distance(80).strength(0.4))
+                .force('charge', d3.forceManyBody().strength(-180))
+                .force('center', d3.forceCenter(window.innerWidth / 2, (window.innerHeight - 46) / 2))
+                .force('collide', d3.forceCollide(24));
 
-        const nodeMap = new Map(nodes.map(d => [d.id, d]));
-        links.forEach(e => { if (!nodeMap.has(e.source) || !nodeMap.has(e.target)) console.warn('Bad link', e); });
+              const link = linkG.selectAll('path').data(links).enter().append('path').attr('class', 'edge');
+              const linkLabel = linkG.selectAll('text').data(links).enter().append('text').attr('class', 'edge-label').text(d => edgeLabel(d.kind));
+              const node = nodeG.selectAll('g').data(nodes).enter().append('g').attr('class', 'node').call(drag(sim));
 
-        const sim = d3.forceSimulation(nodes)
-          .force('link', d3.forceLink(links).id(d => d.id).distance(l => (nodeMap.get(l.source.id||l.source)?.type === 'process' || nodeMap.get(l.target.id||l.target)?.type === 'process') ? 100 : 140).strength(0.55))
-          .force('charge', d3.forceManyBody().strength(-600).distanceMin(20).distanceMax(800))
-          .force('collide', d3.forceCollide().radius(d => d.type === 'process' ? RP * 1.9 : R * 1.9).iterations(2))
-          .force('center', d3.forceCenter(window.innerWidth / 2, (window.innerHeight - 46) / 2))
-          .velocityDecay(0.35);
+              node.each(function (d) {
+                const sel = d3.select(this);
+                if (d.type === 'process') {
+                  sel.append('rect').attr('x', -RP).attr('y', -RP).attr('width', RP * 2).attr('height', RP * 2).attr('transform', 'rotate(45)').attr('fill', color.process);
+                } else {
+                  sel.append('circle').attr('r', R).attr('fill', color[d.type] || '#bbb');
+                }
+                sel.append('text').attr('class', 'label').attr('dy', -22).text(d.id);
+              });
 
-        const linkG = g.append('g').attr('stroke-linecap', 'round');
-        const link = linkG.selectAll('path.edge').data(links).enter().append('path').attr('class', 'edge').attr('marker-end', 'url(#arrow)');
-        const linkLabel = linkG.selectAll('text.edge-label').data(links).enter().append('text').attr('class', 'edge-label').attr('text-anchor', 'middle').text(d => edgeLabel(d.kind));
+              node.on('mousemove', (ev, d) => { tip.innerHTML = `<b>${escapeHtml(d.id)}</b> <span class="pill">${escapeHtml(d.type)}</span>`; tip.style.left = (ev.clientX + 12) + 'px'; tip.style.top = (ev.clientY + 12) + 'px'; tip.style.opacity = 1; })
+                  .on('mouseleave', () => { tip.style.opacity = 0; });
 
-        const nodeG = g.append('g');
-        const node = nodeG.selectAll('.node').data(nodes).enter().append('g').attr('class', 'node')
-          .call(drag(sim))
-          .on('mousemove', (evt, d) => { if (!lockedTip) showTip(d, evt); })
-          .on('mouseleave', () => { if (!lockedTip) hideTip(); })
-          .on('click', (evt, d) => { lockedTip = !lockedTip; if (lockedTip) { showTip(d, evt); tip.style.pointerEvents = 'auto'; } else { hideTip(); tip.style.pointerEvents = 'none'; } evt.stopPropagation(); });
+              sim.on('tick', () => {
+                link.attr('d', d => curved(d));
+                linkLabel.attr('x', d => (d.source.x + d.target.x) / 2).attr('y', d => (d.source.y + d.target.y) / 2 - 6);
+                node.attr('transform', d => `translate(${d.x},${d.y})`);
+              });
 
-        d3.select('#reactionSvg').on('click', () => { if (lockedTip) { lockedTip = false; hideTip(); tip.style.pointerEvents = 'none'; } });
+              function drawLegend() {
+                if (!legendEl) return;
+                const keys = ['host','agent','vector','artifact','stage','species','organism','hybrid','process'];
+                const wrap = document.createElement('div');
+                wrap.style.display = 'grid'; wrap.style.gridTemplateColumns = '1fr 1fr'; wrap.style.gap = '6px 14px';
+                keys.forEach(k => { const row = document.createElement('div'); row.style.display = 'flex'; row.style.alignItems = 'center'; row.style.gap = '8px'; const icon = document.createElement('span'); icon.style.display = 'inline-block'; icon.style.width = '14px'; icon.style.height = '14px'; icon.style.background = color[k]; icon.style.border = '1.5px solid #222'; if (k === 'process') { icon.style.borderRadius = '2px'; icon.style.transform = 'rotate(45deg)'; } else { icon.style.borderRadius = '9999px'; } const label = document.createElement('span'); label.textContent = k; label.style.fontSize = '12px'; row.appendChild(icon); row.appendChild(label); wrap.appendChild(row); }); legendEl.innerHTML = ''; legendEl.appendChild(wrap); }
+              drawLegend();
 
-        node.each(function (d) {
-          const sel = d3.select(this);
-          if (d.type === 'process') { sel.append('rect').attr('x', -RP).attr('y', -RP).attr('width', RP * 2).attr('height', RP * 2).attr('transform', 'rotate(45)').attr('fill', color.process); sel.append('text').attr('class', 'label').attr('dy', 28).text(d.id); }
-          else { sel.append('circle').attr('r', R).attr('fill', color[d.type] || '#bbb'); sel.append('text').attr('class', 'label').attr('dy', -28).text(d.id); }
-        });
+              function runSearch(q) {
+                const query = (q || '').trim().toLowerCase();
+                const ids = new Set();
+                if (query) nodes.forEach(n => { if ((n.id || '').toLowerCase().includes(query)) ids.add(n.id); });
+                node.classed('highlight', d => ids.has(d.id));
+                link.classed('edge-highlight', d => ids.has(d.source.id) || ids.has(d.target.id));
+              }
+              searchInput.addEventListener('input', (e) => runSearch(e.target.value));
+              window.addEventListener('resize', () => sim.force('center', d3.forceCenter(window.innerWidth / 2, (window.innerHeight - 46) / 2)));
 
-        sim.on('tick', () => {
-          link.attr('d', d => curved(d));
-          linkLabel.attr('x', d => (d.source.x + d.target.x) / 2).attr('y', d => (d.source.y + d.target.y) / 2 - 6);
-          node.attr('transform', d => `translate(${d.x},${d.y})`);
-        });
-
-        drawLegend(nodes, legendEl, color);
-        requestAnimationFrame(() => drawLegend(nodes, legendEl, color));
-
-        function runSearch(q) {
-          const query = (q || '').trim().toLowerCase();
-          const ids = new Set();
-          if (query) nodes.forEach(n => { if ((n.id || '').toLowerCase().includes(query)) ids.add(n.id); });
-          node.classed('highlight', d => ids.has(d.id));
-          link.classed('edge-highlight', d => ids.has(d.source.id) || ids.has(d.target.id));
-          if (ids.size === 1) { const id = Array.from(ids)[0]; const d = nodes.find(n => n.id === id); if (d && Number.isFinite(d.x) && Number.isFinite(d.y)) centerOn(d); }
-        }
-        searchInput.addEventListener('input', (e) => runSearch(e.target.value));
-        window.addEventListener('keydown', (e) => { if (e.key === '/') { e.preventDefault(); searchInput.focus(); searchInput.select(); } else if (e.key === 'Enter' && document.activeElement === searchInput) { runSearch(searchInput.value); } });
-
-        function centerOn(d) { const k = 1.6; const t = d3.zoomIdentity.translate(window.innerWidth / 2, (window.innerHeight - 46) / 2).scale(k).translate(-d.x, -d.y); svg.transition().duration(600).call(zoom.transform, t); }
-        function curved(d) { const sx = d.source.x, sy = d.source.y, tx = d.target.x, ty = d.target.y; const cx = (sx + tx) / 2, cy = (sy + ty) / 2 - 12; return `M${sx},${sy} Q${cx},${cy} ${tx},${ty}`; }
-        function drag(sim) { function dragstarted(event, d) { if (!event.active) sim.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; } function dragged(event, d) { d.fx = event.x; d.fy = event.y; } function dragended(event, d) { if (!event.active) sim.alphaTarget(0); d.fx = null; d.fy = null; } return d3.drag().on('start', dragstarted).on('drag', dragged).on('end', dragended); }
-        function edgeLabel(kind) { const map = { reproduction: 'lays/produces', maturation: 'matures', implantation: 'implants', host: 'host', evolution: 'evolves', infection: 'infects', contaminate: 'contaminates', release: 'releases', parasite: 'parasitic outcome', biogenesis: 'forms egg', experiment: 'experiment', anomalous: 'anomalous birth', origin: 'origin', impregnation: 'impregnates', result: 'result', transmission: 'transmission', cloning: 'cloning', gestation: 'gestates', parasitism: 'parasitizes' }; return map[kind] || kind; }
-        function showTip(d, evt) { const html = `<div><b>${escapeHtml(d.id)}</b></div><div class="pill">${escapeHtml(d.type)}</div>${d.notes ? `<div style="margin-top:6px">${escapeHtml(d.notes)}</div>` : ''}${Array.isArray(d.seen) ? `<div style="margin-top:6px"><b>Seen in:</b> ${d.seen.map(x => `<span class=\"pill\">${escapeHtml(x)}</span>`).join(' ')}</div>` : ''}${Array.isArray(d.src) ? `<div style=\"margin-top:6px\"><b>Sources:</b><br>${d.src.map(x => `<a href="${escapeHtml(x.url)}" target="_blank" rel="noopener">${escapeHtml(x.title)}</a>`).join('<br>')}</div>` : ''}`; tip.innerHTML = html; tip.style.left = (evt.clientX + 14) + 'px'; tip.style.top = (evt.clientY + 14) + 'px'; tip.style.opacity = 1; tip.style.pointerEvents = lockedTip ? 'auto' : 'none'; }
-        function hideTip() { tip.style.opacity = 0; }
-        function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
-        function drawLegend(nodes, el, color) { if (!el) return; const order = ['host','agent','vector','artifact','stage','species','organism','hybrid','process','meta']; const used = new Set(nodes.filter(n => n && n.type && color[n.type]).map(n => n.type)); let keys = order.filter(k => used.has(k) && color[k]); if (!keys.length) keys = order.filter(k => color[k]); const entries = keys.map(k => ({ key: k, fill: color[k] })); const wrap = document.createElement('div'); wrap.style.display = 'grid'; wrap.style.gridTemplateColumns = '1fr 1fr'; wrap.style.gap = '6px 14px'; entries.forEach(({ key, fill }) => { const row = document.createElement('div'); row.style.display = 'flex'; row.style.alignItems = 'center'; row.style.gap = '8px'; const icon = document.createElement('span'); icon.style.display = 'inline-block'; icon.style.width = '14px'; icon.style.height = '14px'; icon.style.background = fill; icon.style.border = '1.5px solid #222'; if (key === 'process') { icon.style.borderRadius = '2px'; icon.style.transform = 'rotate(45deg)'; } else { icon.style.borderRadius = '9999px'; } const label = document.createElement('span'); label.textContent = key; label.style.fontSize = '12px'; row.appendChild(icon); row.appendChild(label); wrap.appendChild(row); }); el.innerHTML = ''; if (!entries.length) { const empty = document.createElement('div'); empty.textContent = 'No categories'; empty.style.fontSize = '12px'; empty.style.color = '#555'; el.appendChild(empty); } else { el.appendChild(wrap); } }
-        window.addEventListener('resize', () => sim.force('center', d3.forceCenter(window.innerWidth / 2, (window.innerHeight - 46) / 2)));
-      });
-    }
-
-    // ========= Scoped DAG (loads dag.json) =========
-    function initDagOnce() {
-      const svg = d3.select('#dagSvg');
-      const g = svg.append('g');
-      const linkG = g.append('g');
-      const nodeG = g.append('g');
-      const tip = document.getElementById('dagTip');
-      const status = document.getElementById('dagStatus');
-      const rootSel = document.getElementById('dagRootSel');
-      const zoom = d3.zoom().scaleExtent([0.3, 2]).on('zoom', (ev) => { g.attr('transform', ev.transform); });
+              function curved(d) { const sx = d.source.x, sy = d.source.y, tx = d.target.x, ty = d.target.y; const cx = (sx + tx) / 2, cy = (sy + ty) / 2 - 12; return `M${sx},${sy} Q${cx},${cy} ${tx},${ty}`; }
+              function drag(sim) { function dragstarted(event, d) { if (!event.active) sim.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; } function dragged(event, d) { d.fx = event.x; d.fy = event.y; } function dragended(event, d) { if (!event.active) sim.alphaTarget(0); d.fx = null; d.fy = null; } return d3.drag().on('start', dragstarted).on('drag', dragged).on('end', dragended); }
+              function edgeLabel(kind) { const map = { reproduction: 'lays/produces', maturation: 'matures', implantation: 'implants', host: 'host', evolution: 'evolves', infection: 'infects', contaminate: 'contaminates', release: 'releases', parasite: 'parasitic outcome', biogenesis: 'forms egg', experiment: 'experiment', anomalous: 'anomalous birth', origin: 'origin', impregnation: 'impregnates', result: 'result', transmission: 'transmission', cloning: 'cloning' }; return map[kind] || kind; }
+            });
+          }
       svg.call(zoom);
 
       const typeFill = { host: '#e7f1ff', artifact: '#fff7db', vector: '#fff0c2', stage: '#f3f6f9', species: '#e9f7ef', hybrid: '#f9e6ef', agent: '#efefef', organism: '#f1f8ff', process: '#fbecff' };
@@ -191,8 +187,86 @@
       function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
       function getSize() { const w = window.innerWidth; const h = window.innerHeight - 46 - 52; return { width: Math.max(960, w), height: Math.max(600, h) }; }
 
-      const SOURCES = {}; // optional: could be populated later
-      const DESCRIPTIONS = {}; // optional
+      // Use like-for-like SOURCES/DESCRIPTIONS from aliens-v3.html
+      const SOURCES = {
+        "Human": "https://alienanthology.fandom.com/wiki/Human",
+        "Dog": "https://alienanthology.fandom.com/wiki/Alien_%C2%B3",
+        "Ox": "https://alienanthology.fandom.com/wiki/Alien_%C2%B3",
+        "Engineer": "https://alienanthology.fandom.com/wiki/Engineer",
+        "Pregnant Human": "https://alienanthology.fandom.com/wiki/Alien:_Romulus",
+        "Worms": "https://alienanthology.fandom.com/wiki/Prometheus",
+        "Egg (Ovomorph)": "https://alienanthology.fandom.com/wiki/Ovomorph",
+        "Cocooned Victim": "https://alienanthology.fandom.com/wiki/Ovomorph",
+        "Pods (contaminated)": "https://alienanthology.fandom.com/wiki/Alien:_Covenant",
+        "Protomorph Egg": "https://alienanthology.fandom.com/wiki/Protomorph",
+        "Spores / Motes": "https://alienanthology.fandom.com/wiki/Alien:_Covenant",
+        "Facehugger": "https://alienanthology.fandom.com/wiki/Facehugger",
+        "Royal Facehugger": "https://alienanthology.fandom.com/wiki/Queen",
+        "Chestburster": "https://alienanthology.fandom.com/wiki/Chestburster",
+        "Bloodburster": "https://alienanthology.fandom.com/wiki/Alien:_Covenant",
+        "Proto-Facehugger": "https://alienanthology.fandom.com/wiki/Protomorph",
+        "Drone": "https://alienanthology.fandom.com/wiki/Drone",
+        "Warrior": "https://alienanthology.fandom.com/wiki/Soldier",
+        "Runner": "https://alienanthology.fandom.com/wiki/Runner",
+        "Praetorian": "https://alienanthology.fandom.com/wiki/Royal_Guard",
+        "Queen": "https://alienanthology.fandom.com/wiki/Queen",
+        "Neomorph": "https://avp.fandom.com/wiki/Neomorph",
+        "Protomorph": "https://alienanthology.fandom.com/wiki/Protomorph",
+        "Deacon": "https://alienanthology.fandom.com/wiki/The_Deacon",
+        "Newborn": "https://alienanthology.fandom.com/wiki/The_Newborn",
+        "Cloned Queen (human DNA)": "https://alienanthology.fandom.com/wiki/Cloned_Queen",
+        "Black Goo": "https://alienanthology.fandom.com/wiki/Chemical_A0-3959X.91_%E2%80%93_15",
+        "Infected Human": "https://alienanthology.fandom.com/wiki/Prometheus",
+        "Trilobite": "https://alienanthology.fandom.com/wiki/The_Trilobite",
+        "Hammerpede": "https://alienanthology.fandom.com/wiki/Hammerpede",
+        "Offspring": "https://alienanthology.fandom.com/wiki/Alien:_Romulus",
+        "Ellen Ripley (DNA)": "https://alienanthology.fandom.com/wiki/Ellen_Ripley",
+        "Lay Egg": "https://alienanthology.fandom.com/wiki/Ovomorph",
+        "Hatch Normal": "https://alienanthology.fandom.com/wiki/Facehugger",
+        "Hatch Royal": "https://alienanthology.fandom.com/wiki/Queen",
+        "Egg Morphing": "https://en.wikipedia.org/wiki/Xenomorph#Egg",
+        "Implantation: Facehugger + Human": "https://alienanthology.fandom.com/wiki/Facehugger",
+        "Implantation: Facehugger + Dog": "https://alienanthology.fandom.com/wiki/Alien_%C2%B3",
+        "Implantation: Facehugger + Ox": "https://alienanthology.fandom.com/wiki/Alien_%C2%B3",
+        "Royal Implantation (Queen embryo)": "https://alienanthology.fandom.com/wiki/Queen",
+        "Mature (Human host)": "https://alienanthology.fandom.com/wiki/Xenomorph_XX121",
+        "Mature (Quadruped host)": "https://alienanthology.fandom.com/wiki/Runner",
+        "Evolve: Drone → Praetorian": "https://alienanthology.fandom.com/wiki/Royal_Guard",
+        "Evolve: Praetorian → Queen": "https://alienanthology.fandom.com/wiki/Queen",
+        "Black Goo + Human": "https://alienanthology.fandom.com/wiki/Chemical_A0-3959X.91_%E2%80%93_15",
+        "Parasitic transfer (sexual)": "https://alienanthology.fandom.com/wiki/Prometheus",
+        "Trilobite + Engineer": "https://alienanthology.fandom.com/wiki/Prometheus",
+        "Black Goo + Ecosystem": "https://alienanthology.fandom.com/wiki/Alien:_Covenant",
+        "Pods release Spores": "https://alienanthology.fandom.com/wiki/Alien:_Covenant",
+        "Spores infect Human": "https://alienanthology.fandom.com/wiki/Alien:_Covenant",
+        "Bloodburster → Neomorph": "https://alienanthology.fandom.com/wiki/Alien:_Covenant",
+        "Experimental line": "https://alienanthology.fandom.com/wiki/Alien:_Covenant",
+        "Hatch (Proto)": "https://alienanthology.fandom.com/wiki/Protomorph",
+        "Implantation: Proto-Facehugger + Human": "https://alienanthology.fandom.com/wiki/Protomorph",
+        "Mature (Proto host)": "https://alienanthology.fandom.com/wiki/Protomorph",
+        "Cloning (Resurrection)": "https://alienanthology.fandom.com/wiki/Alien:_Resurrection",
+        "Queen live birth (clone context)": "https://alienanthology.fandom.com/wiki/The_Newborn",
+        "Black Goo + Worms": "https://alienanthology.fandom.com/wiki/Prometheus"
+      };
+      const DESCRIPTIONS = {
+        "Egg (Ovomorph)": "A leathery ovum that houses a Facehugger. Canon depicts two creation routes: (1) primary—laid by a Queen in a hive; (2) fallback—formed via egg morphing when no Queen is present (Alien 1979 Director's Cut). The derelict egg caches' ultimate origin is left ambiguous, while prequel material shows engineered seeding via the pathogen.",
+        "Lay Egg": "Queen-led reproduction: the Queen produces Ovomorphs in quantity within a hive; each typically contains a Facehugger (Aliens).",
+        "Egg Morphing": "Fallback biogenesis observed in Alien (1979, Director's Cut): a cocooned host is transformed into an Ovomorph housing a Facehugger when no Queen is available.",
+        "Pods (contaminated)": "Fungal seed pods (often called small 'spore sacs' in materials) that formed on Planet 4 when the Engineer pathogen (\"black goo\") contaminated the local ecosystem. They are not Xenomorph eggs. Physical disturbance causes the pods to rupture.",
+        "Pods release Spores": "When disturbed, the small pods/spore sacs burst and aerosolize microscopic motes that drift on air currents.",
+        "Spores / Motes": "Airborne motes released by small fungus-like pods (spore sacs) on Planet 4 following black goo contamination. The motes penetrate soft tissues (e.g., ear canal) and parasitize human hosts, producing Bloodbursters that rapidly mature into Neomorphs (as with Ledward and Hallett in Alien: Covenant).",
+        "Protomorph Egg": "Artificial ova cultured by David using the Engineer pathogen and local biomatter (Alien: Covenant). These are not natural queen-laid eggs; they house a fast-acting facehugger variant used to implant hosts in David's lab.",
+        "Proto-Facehugger": "Also called a protohugger in some materials, this facehugger variant emerges from Protomorph eggs in David's lab and rapidly implants a human host, yielding a chestburster that matures into a Protomorph (Alien: Covenant).",
+        "Hatch (Proto)": "Emergence of the protohugger from a Protomorph egg in David's chamber (Alien: Covenant).",
+        "Implantation: Proto-Facehugger + Human": "Protohugger attaches and implants a human host extremely quickly in Alien: Covenant, leading to a distinct chestburster stage.",
+        "Mature (Proto host)": "The proto chestburster rapidly matures into the adult Protomorph in Alien: Covenant.",
+        "Neomorph": "A pale, spindly xenomorph-like organism produced when black goo–generated motes from small fungal spore sacs/pods infect a human host (Alien: Covenant). Neomorphs do not come from queen-laid eggs or facehuggers; they arise via spores → Bloodburster → Neomorph, independent of David's engineered eggs.",
+        "Ellen Ripley (DNA)": "Genetic material recovered from Ellen Ripley after her death on Fiorina 161. In Alien: Resurrection, Weyland-Yutani/USM cloned Ripley using DNA mixed with a gestating Queen embryo, producing hybridized clones.",
+        "Cloning (Resurrection)": "USM program aboard the USM Auriga that cloned Ripley from mixed Human/Queen DNA. Iterative attempts resulted in several malformed clones before a successful hybrid (Ripley 8) bearing a Queen embryo was produced.",
+        "Cloned Queen (human DNA)": "Queen resulting from cloning using mixed human and Xenomorph DNA. Exhibits anomalies such as a functional womb, enabling live birth within the clone context.",
+        "Queen live birth (clone context)": "An anomalous reproductive event: the cloned Queen bears a live-born hybrid instead of laying eggs, resulting in the Newborn.",
+        "Offspring": "A human–Xenomorph hybrid birthed by Kay Harrison after self-injecting compound Z-01 aboard the USCSS Corbelan IV (Alien: Romulus)."
+      };
 
       fetch('dag.json').then(r => r.json()).then(DATA => {
         const currentData = withSources(DATA);
@@ -211,7 +285,56 @@
         function combinedNodes(d) { const ps = (d.processes||[]).map(p => ({ id: p.id, type: 'process', source: p.source })); return [...(d.nodes||[]), ...ps]; }
         function targetList(d) { const ids = new Set(); const list = []; (d.nodes||[]).forEach(n => { if (n.type === 'species' || n.type === 'hybrid') { ids.add(n.id); list.push(n.id); } }); (d.finalProducts||[]).forEach(id => { if (!ids.has(id)) { ids.add(id); list.push(id); } }); return list; }
         function buildMaps(d) { const nodesAll = combinedNodes(d); const nodeMap = new Map(nodesAll.map(n => [n.id, n])); const out = new Map(); const inc = new Map(); (d.links||[]).forEach(e => { if (!nodeMap.has(e.source) || !nodeMap.has(e.target)) return; if (!out.has(e.source)) out.set(e.source, []); out.get(e.source).push(e); if (!inc.has(e.target)) inc.set(e.target, []); inc.get(e.target).push(e); }); return { nodesAll, nodeMap, out, inc }; }
-        function allowedPredicateForTarget(targetId) { return _ => true; } // simplified scoping; can be extended
+        // Like-for-like scoping from aliens-v3.html
+        const CLASSIC = new Set(['Drone', 'Warrior', 'Runner', 'Queen']);
+        const PROTO = new Set(['Protomorph']);
+        const NEWBORN = new Set(['Newborn']);
+        const PATHOGEN = new Set(['Neomorph', 'Deacon', 'Hammerpede']);
+        function allowedPredicateForTarget(targetId) {
+          if (targetId === 'Cloned Queen (human DNA)') {
+            const allow = new Set(['Queen','Human','Ellen Ripley (DNA)','Cloning (Resurrection)','Cloned Queen (human DNA)','Queen live birth (clone context)','Newborn']);
+            return id => allow.has(id);
+          }
+          if (CLASSIC.has(targetId)) {
+            if (targetId === 'Runner') {
+              const allow = new Set(['Dog','Ox','Cocooned Victim','Egg (Ovomorph)','Facehugger','Chestburster','Mature (Quadruped host)','Lay Egg','Egg Morphing','Hatch Normal','Implantation: Facehugger + Dog','Implantation: Facehugger + Ox','Runner']);
+              return id => allow.has(id);
+            }
+            if (targetId === 'Queen') {
+              const allow = new Set(['Human','Cocooned Victim','Egg (Ovomorph)','Facehugger','Royal Facehugger','Chestburster','Praetorian','Lay Egg','Egg Morphing','Hatch Normal','Hatch Royal','Royal Implantation (Queen embryo)','Evolve: Drone → Praetorian','Evolve: Praetorian → Queen','Queen']);
+              return id => allow.has(id);
+            }
+            const allow = new Set(['Human','Cocooned Victim','Egg (Ovomorph)','Facehugger','Chestburster','Lay Egg','Egg Morphing','Hatch Normal','Implantation: Facehugger + Human','Mature (Human host)','Drone','Warrior']);
+            return id => allow.has(id);
+          }
+          if (PROTO.has(targetId)) {
+            const allow = new Set(['Black Goo','Human','Chestburster','Experimental line','Protomorph Egg','Hatch (Proto)','Proto-Facehugger','Implantation: Proto-Facehugger + Human','Mature (Proto host)','Protomorph']);
+            return id => allow.has(id);
+          }
+          if (NEWBORN.has(targetId)) {
+            const allow = new Set(['Queen','Human','Cloning (Resurrection)','Cloned Queen (human DNA)','Queen live birth (clone context)','Newborn']);
+            return id => allow.has(id);
+          }
+          if (PATHOGEN.has(targetId)) {
+            if (targetId === 'Neomorph') {
+              const allow = new Set(['Black Goo','Black Goo + Ecosystem','Pods (contaminated)','Pods release Spores','Spores / Motes','Spores infect Human','Human','Bloodburster','Bloodburster → Neomorph','Neomorph']);
+              return id => allow.has(id);
+            }
+            if (targetId === 'Deacon') {
+              const allow = new Set(['Black Goo','Human','Black Goo + Human','Infected Human','Parasitic transfer (sexual)','Trilobite','Engineer','Trilobite + Engineer','Deacon']);
+              return id => allow.has(id);
+            }
+            if (targetId === 'Hammerpede') {
+              const allow = new Set(['Black Goo','Worms','Black Goo + Worms','Hammerpede']);
+              return id => allow.has(id);
+            }
+          }
+          if (targetId === 'Offspring') {
+            const allow = new Set(['Black Goo','Pregnant Human','Experimental line','Offspring']);
+            return id => allow.has(id);
+          }
+          return _ => true;
+        }
         function buildSubgraph(d, targetId) { const { nodeMap, out, inc } = buildMaps(d); if (!nodeMap.has(targetId)) return { nodes: [], links: [] }; const allow = allowedPredicateForTarget(targetId); if (!allow(targetId)) return { nodes: [], links: [] }; const nodesSet = new Set([targetId]); const edges = []; const q = [targetId]; while (q.length) { const v = q.shift(); const ins = inc.get(v) || []; for (const e of ins) { if (!allow(e.source) || !allow(e.target)) continue; edges.push(e); if (!nodesSet.has(e.source)) { nodesSet.add(e.source); q.push(e.source); } } } const nodes = Array.from(nodesSet).map(id => nodeMap.get(id)).filter(Boolean); return { nodes, links: edges }; }
 
         function render(json, target) {
@@ -220,7 +343,9 @@
           const indeg = new Map(nodes.map(n => [n.id, 0])); links.forEach(e => indeg.set(e.target, (indeg.get(e.target) || 0) + 1)); const seeds = nodes.filter(n => (indeg.get(n.id) || 0) === 0).map(n => n.id); const rank = new Map(); const q = [...seeds]; seeds.forEach(s => rank.set(s, 0)); while (q.length) { const u = q.shift(); const ru = rank.get(u); (out.get(u) || []).forEach(e => { const v = e.target; const rv = rank.has(v) ? rank.get(v) : Infinity; const nr = ru + 1; if (nr < rv) { rank.set(v, nr); q.push(v); } }); }
           const layered = d3.groups(nodes, d => rank.get(d.id) ?? 0).sort((a,b) => a[0]-b[0]); const colW = 220; const margins = { top: 40, left: 40, right: 40, bottom: 40 }; const xForRank = r => margins.left + r * colW; const layerHeights = layered.map(([rk, arr]) => ({ rk, arr, spacing: (height - margins.top - margins.bottom) / (arr.length + 1) })); const pos = new Map(); layerHeights.forEach(({ rk, arr, spacing }) => { arr.forEach((d, i) => { const x = xForRank(rk); const y = margins.top + (i + 1) * spacing; pos.set(d.id, { x, y }); }); });
           const pathFor = (a, b) => { const p0 = pos.get(a), p1 = pos.get(b); const mx = (p0.x + p1.x) / 2; return `M${p0.x},${p0.y} C${mx},${p0.y} ${mx},${p1.y} ${p1.x},${p1.y}`; };
-          const linkSel = linkG.selectAll('path.link').data(links.filter(e => nodeMap.has(e.source) && nodeMap.has(e.target))).enter().append('path').attr('class', 'link').attr('d', e => pathFor(e.source, e.target));
+          const linkSel = linkG.selectAll('path.link').data(links.filter(e => nodeMap.has(e.source) && nodeMap.has(e.target))).enter().append('path')
+            .attr('class', e => ((rank.get(e.target) ?? 0) <= (rank.get(e.source) ?? 0)) ? 'link back' : 'link')
+            .attr('d', e => pathFor(e.source, e.target));
           const defs = svg.append('defs'); defs.append('marker').attr('id', 'arrow').attr('viewBox','0 0 10 10').attr('refX',10).attr('refY',5).attr('markerWidth',6).attr('markerHeight',6).attr('orient','auto-start-reverse').append('path').attr('d','M 0 0 L 10 5 L 0 10 z').attr('fill','#888'); linkSel.attr('marker-end', 'url(#arrow)');
           linkG.selectAll('text.edge-label').data(links).enter().append('text').attr('class','edge-label').attr('x', e => (pos.get(e.source).x + pos.get(e.target).x)/2).attr('y', e => (pos.get(e.source).y + pos.get(e.target).y)/2 - 6).text(e => edgeLabel(e.kind));
           const nodeSel = nodeG.selectAll('g.node').data(nodes).enter().append('g').attr('class','node').attr('transform', d => `translate(${pos.get(d.id).x},${pos.get(d.id).y})`).on('mousemove', (ev, d) => { if (!pinned) showTip(d, ev); }).on('mouseleave', () => { if (!pinned) hideTip(); }).on('click', (ev, d) => pinTooltip(d, ev));
@@ -228,7 +353,21 @@
 
           function showTip(d, ev) { const html = `<div><b>${escapeHtml(d.id)}</b></div><div class="pill">${escapeHtml(d.type)}</div><div style="margin-top:4px;color:#ddd">Click for details</div>`; tip.innerHTML = html; tip.style.left = (ev.clientX + 12) + 'px'; tip.style.top = (ev.clientY + 12) + 'px'; tip.style.opacity = 1; }
           function hideTip() { tip.style.opacity = 0; }
-          function pinTooltip(d, ev) { if (pinned && pinnedNode && pinnedNode.id === d.id) { unpinTooltip(); return; } pinned = true; pinnedNode = d; const px = ev.clientX + 12, py = ev.clientY + 12; tip.style.left = px + 'px'; tip.style.top = py + 'px'; tip.style.opacity = 1; tip.style.pointerEvents = 'auto'; const src = d.source ? `<div style="margin:6px 0 8px"><a href="${escapeHtml(d.source)}" target="_blank" rel="noopener">Open SOURCE ↗</a></div>` : '<div style="margin:6px 0 8px"><span>No source link</span></div>'; const desc = DESCRIPTIONS[d.id] || ''; tip.innerHTML = `<div style="display:flex;align-items:center;gap:8px;justify-content:space-between"><div><b>${escapeHtml(d.id)}</b> <span class="pill">${escapeHtml(d.type)}</span></div><button id="tipCloseBtn" aria-label="Close" style="border:none;background:#333;color:#fff;border-radius:12px;padding:2px 8px;cursor:pointer">×</button></div>${src}<div class="body" style="max-width:300px;line-height:1.35">${escapeHtml(desc || 'No description.')}</div>`; const btn = document.getElementById('tipCloseBtn'); if (btn) btn.onclick = (e) => { e.stopPropagation(); unpinTooltip(); }; }
+          function pinTooltip(d, ev) {
+            if (pinned && pinnedNode && pinnedNode.id === d.id) { unpinTooltip(); return; }
+            pinned = true; pinnedNode = d;
+            const px = ev.clientX + 12, py = ev.clientY + 12;
+            tip.style.left = px + 'px'; tip.style.top = py + 'px'; tip.style.opacity = 1; tip.style.pointerEvents = 'auto';
+            const preset = DESCRIPTIONS[d.id] || '';
+            tip.innerHTML = buildPinnedHtml(d, preset || 'Loading…', null);
+            bindTipClose();
+            const key = d.source || d.id;
+            if (detailCache.has(key)) { const info = detailCache.get(key); updatePinned(d, preset, info); return; }
+            fetchDetails(d).then(info => { detailCache.set(key, info); updatePinned(d, preset, info); })
+              .catch(() => { updatePinned(d, preset || 'Description unavailable. Open the SOURCE link for details.', { thumbnail: null, extract: preset }); });
+          }
+          function buildPinnedHtml(d, extract, thumbnail) { const src = d.source ? `<div style="margin:6px 0 8px"><a href="${escapeHtml(d.source)}" target="_blank" rel="noopener">Open SOURCE ↗</a></div>` : '<div style="margin:6px 0 8px"><span>No source link</span></div>'; const img = thumbnail ? `<div class="thumb" style="margin:6px 0 8px"><img alt="thumbnail" src="${escapeHtml(thumbnail)}" style="max-width:260px;border-radius:6px;border:1px solid #333"/></div>` : ''; const body = `<div class="body" style="max-width:300px;line-height:1.35">${escapeHtml(extract || 'No description.')}</div>`; return `<div style="display:flex;align-items:center;gap:8px;justify-content:space-between"><div><b>${escapeHtml(d.id)}</b> <span class="pill">${escapeHtml(d.type)}</span></div><button id="tipCloseBtn" aria-label="Close" style="border:none;background:#333;color:#fff;border-radius:12px;padding:2px 8px;cursor:pointer">×</button></div>${src}${img}${body}`; }
+          function bindTipClose() { const btn = document.getElementById('tipCloseBtn'); if (btn) btn.onclick = (e) => { e.stopPropagation(); unpinTooltip(); }; }
           function unpinTooltip() { pinned = false; pinnedNode = null; tip.style.opacity = 0; tip.style.pointerEvents = 'none'; }
         }
 
