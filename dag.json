@@ -1,774 +1,775 @@
 {
-    "title": "Alien Franchise — Cohesive Lifecycle Overview (Film Canon only; no AVP)",
-    "scope": "Classic hive, Engineer pathogen branches, and experimental lines (Resurrection, Romulus).",
-    
-    "nodes": [
-        {
-            "id": "Human",
-            "type": "host",
-            "source": "https://alienanthology.fandom.com/wiki/Human",
-            "image": "https://static.wikia.nocookie.net/alienanthology/images/7/77/Kane_alien.jpg",
-            "description": "Baseline human host species frequently parasitized in the Alien films."
-        },
-        {
-            "id": "Dog",
-            "type": "host",
-            "source": "https://alienanthology.fandom.com/wiki/Alien³",
-            "image": "https://static.wikia.nocookie.net/alienanthology/images/2/2d/Spike.jpg",
-            "description": "Quadruped host from Alien 3 that produces a faster, runner-type xenomorph."
-        },
-        {
-            "id": "Ox",
-            "type": "host",
-            "source": "https://alienanthology.fandom.com/wiki/Alien³",
-            "image": "https://static.wikia.nocookie.net/alienanthology/images/5/5c/Ox_alien3.jpg",
-            "description": "Alternate quadruped host shown in the Assembly Cut of Alien 3."
-        },
-        {
-            "id": "Engineer",
-            "type": "host",
-            "source": "https://alienanthology.fandom.com/wiki/Engineer",
-            "image": "https://static.wikia.nocookie.net/alienanthology/images/a/ab/Engineer.jpg",
-            "description": "Ancient humanoid species linked to creation and bioweapons in Prometheus."
-        },
-        {
-            "id": "Pregnant Human",
-            "type": "host",
-            "source": "https://alienanthology.fandom.com/wiki/Alien:_Romulus",
-            "image": "https://static.wikia.nocookie.net/alienanthology/images/3/33/Romulus_pregnant_host.jpg",
-            "description": "A human host during pregnancy; used in an experimental line in Alien: Romulus."
-        },
-        {
-            "id": "Worms",
-            "type": "host",
-            "source": "https://alienanthology.fandom.com/wiki/Prometheus",
-            "image": "https://static.wikia.nocookie.net/alienanthology/images/e/ea/Prometheus_worms.jpg",
-            "description": "Small annelid-like organisms on LV-223 that mutate into Hammerpedes when exposed to the pathogen."
-        },
-        {
-            "id": "Ellen Ripley (DNA)",
-            "type": "artifact",
-            "source": "https://alienanthology.fandom.com/wiki/Ellen_Ripley",
-            "image": "https://static.wikia.nocookie.net/alienanthology/images/4/49/Ripley8.jpg",
-            "description": "Genetic sample used by the USM to clone Ripley and a gestating Queen in Alien: Resurrection."
-        },
-        {
-            "id": "Egg (Ovomorph)",
-            "type": "artifact",
-            "source": "https://alienanthology.fandom.com/wiki/Ovomorph",
-            "image": "https://static.wikia.nocookie.net/alienanthology/images/0/0e/Egg.jpg",
-            "description": "Leathery egg housing a Facehugger; typically laid by a Queen, with a fallback egg-morphing route."
-        },
-        {
-            "id": "Cocooned Victim",
-            "type": "artifact",
-            "source": "https://alienanthology.fandom.com/wiki/Ovomorph",
-            "image": "https://static.wikia.nocookie.net/alienanthology/images/2/28/BrettEgg.jpg",
-            "description": "Hosts encased and biotransformed into new Ovomorphs in the egg morphing process."
-        },
-        {
-            "id": "Pods (contaminated)",
-            "type": "artifact",
-            "source": "https://alienanthology.fandom.com/wiki/Alien:_Covenant",
-            "image": "https://static.wikia.nocookie.net/avp/images/a/ad/Egg_sack.png",
-            "description": "Fungal pods formed after pathogen contamination on Planet 4; rupture to release motes."
-        },
-        {
-            "id": "Protomorph Egg",
-            "type": "artifact",
-            "source": "https://alienanthology.fandom.com/wiki/Protomorph",
-            "image": "https://static.wikia.nocookie.net/avp/images/f/f2/Covenant_trailer_egg_%283%29.png",
-            "description": "Artificial ova cultured by David using the Engineer pathogen and local biomatter."
-        },
-        {
-            "id": "Spores / Motes",
-            "type": "vector",
-            "source": "https://avp.fandom.com/wiki/Motes",
-            "image": "https://static.wikia.nocookie.net/avp/images/8/8a/Motes.png",
-            "description": "Airborne motes from ruptured pods that infiltrate soft tissue and seed Neomorphs."
-        },
-        {
-            "id": "Facehugger",
-            "type": "stage",
-            "source": "https://alienanthology.fandom.com/wiki/Facehugger",
-            "image": "https://static.wikia.nocookie.net/alienanthology/images/a/ab/Facehugger-alien-aliens-8255454-473-300.jpg",
-            "description": "Parasitic life stage that attaches to a host and implants an embryo via proboscis."
-        },
-        {
-            "id": "Royal Facehugger",
-            "type": "stage",
-            "source": "https://alienanthology.fandom.com/wiki/Queen",
-            "image": "https://static.wikia.nocookie.net/alienanthology/images/d/d3/Royal_facehugger.jpg",
-            "description": "A rare variant carrying a Queen embryo, associated with royal implantation events."
-        },
-        {
-            "id": "Chestburster",
-            "type": "stage",
-            "source": "https://alienanthology.fandom.com/wiki/Chestburster",
-            "image": "https://static.wikia.nocookie.net/alienanthology/images/8/80/Alien-The_Chestburster.png",
-            "description": "Neonate stage that erupts from the host's thoracic cavity before rapid maturation."
-        },
-        {
-            "id": "Bloodburster",
-            "type": "stage",
-            "source": "https://avp.fandom.com/wiki/Bloodburster",
-            "image": "https://static.wikia.nocookie.net/avp/images/6/60/Baby_Neomorph_attacking_pose.png",
-            "description": "Early-stage organism produced by motes; rapidly matures into a Neomorph."
-        },
-        {
-            "id": "Proto-Facehugger",
-            "type": "stage",
-            "source": "https://alienanthology.fandom.com/wiki/Protomorph",
-            "image": "https://static.wikia.nocookie.net/alienanthology/images/1/1e/Proto_Facehugger.jpg",
-            "description": "Fast-acting facehugger variant from Protomorph eggs used by David in Alien: Covenant."
-        },
-        {
-            "id": "Drone",
-            "type": "species",
-            "source": "https://alienanthology.fandom.com/wiki/Drone",
-            "image": "https://static.wikia.nocookie.net/alienanthology/images/8/83/Sevastopol_Alien.jpg",
-            "description": "Adult xenomorph caste observed in Alien; stealthy hunter with biomechanical features."
-        },
-        {
-            "id": "Warrior",
-            "type": "species",
-            "source": "https://alienanthology.fandom.com/wiki/Soldier",
-            "image": "https://static.wikia.nocookie.net/alienanthology/images/d/d4/Aliens_still23.jpg",
-            "description": "Aggressive hive defenders seen in Aliens; sometimes referred to as Soldiers."
-        },
-        {
-            "id": "Runner",
-            "type": "species",
-            "source": "https://alienanthology.fandom.com/wiki/Runner",
-            "image": "https://static.wikia.nocookie.net/avp/images/4/48/Runner_2.PNG",
-            "description": "Quadrupedal xenomorph morphology arising from a dog/ox host in Alien 3."
-        },
-        {
-            "id": "Praetorian",
-            "type": "stage",
-            "source": "https://alienanthology.fandom.com/wiki/Royal_Guard",
-            "image": "https://static.wikia.nocookie.net/alienanthology/images/5/51/Xenomorph_Royal_Guard.jpg",
-            "description": "Intermediary royal caste that can develop into a Queen under specific conditions."
-        },
-        {
-            "id": "Queen",
-            "type": "species",
-            "source": "https://alienanthology.fandom.com/wiki/Queen",
-            "image": "https://static.wikia.nocookie.net/alienanthology/images/a/a4/Aliens_Queen.jpg",
-            "description": "Egg-laying hive matriarch responsible for producing Ovomorphs."
-        },
-        {
-            "id": "Neomorph",
-            "type": "species",
-            "source": "https://avp.fandom.com/wiki/Neomorph",
-            "image": "https://static.wikia.nocookie.net/avp/images/d/d2/The_Neomorph_%2810%29.png",
-            "description": "Pale, spindly organism produced by motes infecting human hosts in Alien: Covenant."
-        },
-        {
-            "id": "Protomorph",
-            "type": "species",
-            "source": "https://alienanthology.fandom.com/wiki/Protomorph",
-            "image": "https://static.wikia.nocookie.net/alienanthology/images/1/19/Praetomorph-closeup.jpg",
-            "description": "Xenomorph-like organism resulting from David's engineered line in Alien: Covenant."
-        },
-        {
-            "id": "Deacon",
-            "type": "species",
-            "source": "https://alienanthology.fandom.com/wiki/The_Deacon",
-            "image": "https://static.wikia.nocookie.net/alienanthology/images/c/ca/ProtoAlien.jpg",
-            "description": "Proto-xenomorph born from a Trilobite implanting an Engineer in Prometheus."
-        },
-        {
-            "id": "Newborn",
-            "type": "hybrid",
-            "source": "https://alienanthology.fandom.com/wiki/The_Newborn",
-            "image": "https://static.wikia.nocookie.net/alienanthology/images/6/63/Newborn_profile.jpg",
-            "description": "Human–xenomorph hybrid live-born from the cloned Queen in Alien: Resurrection."
-        },
-        {
-            "id": "Cloned Queen (human DNA)",
-            "type": "species",
-            "source": "https://alienanthology.fandom.com/wiki/Cloned_Queen",
-            "image": "https://static.wikia.nocookie.net/alienanthology/images/1/17/Alien_Resurrection_Queen1.jpg",
-            "description": "Queen produced via cloning with mixed human/xenomorph DNA, exhibiting reproductive anomalies."
-        },
-        {
-            "id": "Black Goo",
-            "type": "agent",
-            "source": "https://alienanthology.fandom.com/wiki/Chemical_A0-3959X.91_%E2%80%93_15",
-            "image": "https://static.wikia.nocookie.net/alienanthology/images/6/6c/Prometheus_pathogen.jpg",
-            "description": "Engineer bioweapon/pathogen that rewrites biology and triggers aggressive morphogenesis."
-        },
-        {
-            "id": "Infected Human",
-            "type": "organism",
-            "source": "https://alienanthology.fandom.com/wiki/Prometheus",
-            "image": "https://static.wikia.nocookie.net/avp/images/5/5d/58264088.jpg",
-            "description": "Human altered by exposure to the pathogen, enabling secondary parasitic outcomes."
-        },
-        {
-            "id": "Trilobite",
-            "type": "organism",
-            "source": "https://alienanthology.fandom.com/wiki/The_Trilobite",
-            "image": "https://static.wikia.nocookie.net/alienanthology/images/3/31/BabyTrilobite.jpg",
-            "description": "Giant cephalopod-like parasite generated via pathogen-mediated reproduction in Prometheus."
-        },
-        {
-            "id": "Hammerpede",
-            "type": "organism",
-            "source": "https://alienanthology.fandom.com/wiki/Hammerpede",
-            "image": "https://static.wikia.nocookie.net/alienanthology/images/8/8d/Promethues_Snakes.png",
-            "description": "Aggressive serpentine organism created when local worms are mutated by the pathogen."
-        },
-        {
-            "id": "Offspring",
-            "type": "organism",
-            "source": "https://avp.fandom.com/wiki/Offspring",
-            "image": "https://static.wikia.nocookie.net/alienanthology/images/4/43/Romulus_offspring.jpg",
-            "description": "Human–xenomorph hybrid birthed by Kay Harrison after experimental exposure (Alien: Romulus)."
-        }
-    ],
-    "processes": [
-        {
-            "id": "Lay Egg",
-            "kind": "reproduction",
-            "source": "https://alienanthology.fandom.com/wiki/Ovomorph",
-            "image": null,
-            "description": "Queen produces Ovomorphs within a hive; each typically contains a Facehugger."
-        },
-        {
-            "id": "Hatch Normal",
-            "kind": "maturation",
-            "source": "https://alienanthology.fandom.com/wiki/Facehugger",
-            "image": null,
-            "description": "Standard hatching event where an Ovomorph opens and a Facehugger emerges."
-        },
-        {
-            "id": "Hatch Royal",
-            "kind": "maturation",
-            "source": "https://alienanthology.fandom.com/wiki/Queen",
-            "image": null,
-            "description": "Hatching that yields a royal facehugger carrying a Queen embryo."
-        },
-        {
-            "id": "Egg Morphing",
-            "kind": "biogenesis",
-            "source": "https://en.wikipedia.org/wiki/Xenomorph#Egg",
-            "image": null,
-            "description": "Fallback route observed in Alien (1979 Director's Cut): cocooned hosts become eggs."
-        },
-        {
-            "id": "Implantation: Facehugger + Human",
-            "kind": "implantation",
-            "source": "https://alienanthology.fandom.com/wiki/Facehugger",
-            "image": null,
-            "description": "Facehugger attaches to a human and implants an embryo that later chestbursts."
-        },
-        {
-            "id": "Implantation: Facehugger + Dog",
-            "kind": "implantation",
-            "source": "https://alienanthology.fandom.com/wiki/Alien³",
-            "image": null,
-            "description": "Implantation into a canine host, leading to a quadruped morphology."
-        },
-        {
-            "id": "Implantation: Facehugger + Ox",
-            "kind": "implantation",
-            "source": "https://alienanthology.fandom.com/wiki/Alien³",
-            "image": null,
-            "description": "Implantation into a bovine host, as depicted in the Assembly Cut."
-        },
-        {
-            "id": "Royal Implantation (Queen embryo)",
-            "kind": "implantation",
-            "source": "https://alienanthology.fandom.com/wiki/Queen",
-            "image": null,
-            "description": "A royal facehugger implants a Queen embryo into a suitable host."
-        },
-        {
-            "id": "Mature (Human host)",
-            "kind": "maturation",
-            "source": "https://alienanthology.fandom.com/wiki/Xenomorph_XX121",
-            "image": null,
-            "description": "Standard maturation from chestburster to adult when the host is human."
-        },
-        {
-            "id": "Mature (Quadruped host)",
-            "kind": "maturation",
-            "source": "https://alienanthology.fandom.com/wiki/Runner",
-            "image": null,
-            "description": "Maturation pathway producing a runner-type organism from a quadruped host."
-        },
-        {
-            "id": "Evolve: Drone → Praetorian",
-            "kind": "evolution",
-            "source": "https://alienanthology.fandom.com/wiki/Royal_Guard",
-            "image": null,
-            "description": "Under certain conditions, a Drone can develop into a Praetorian."
-        },
-        {
-            "id": "Evolve: Praetorian → Queen",
-            "kind": "evolution",
-            "source": "https://alienanthology.fandom.com/wiki/Queen",
-            "image": null,
-            "description": "A Praetorian can advance further to become a Queen."
-        },
-        {
-            "id": "Black Goo + Human",
-            "kind": "infection",
-            "source": "https://alienanthology.fandom.com/wiki/Chemical_A0-3959X.91_%E2%80%93_15",
-            "image": null,
-            "description": "Exposure of a human to the pathogen, triggering radical biological changes."
-        },
-        {
-            "id": "Parasitic transfer (sexual)",
-            "kind": "transmission",
-            "source": "https://alienanthology.fandom.com/wiki/Prometheus",
-            "image": null,
-            "description": "Secondary transfer of infection from an altered human to a partner."
-        },
-        {
-            "id": "Trilobite + Engineer",
-            "kind": "impregnation",
-            "source": "https://alienanthology.fandom.com/wiki/Prometheus",
-            "image": null,
-            "description": "Trilobite restrains and implants an Engineer, resulting in the Deacon."
-        },
-        {
-            "id": "Black Goo + Ecosystem",
-            "kind": "contaminate",
-            "source": "https://alienanthology.fandom.com/wiki/Alien:_Covenant",
-            "image": null,
-            "description": "Pathogen dispersal across local flora and fauna leading to pod formation."
-        },
-        {
-            "id": "Pods release Spores",
-            "kind": "release",
-            "source": "https://alienanthology.fandom.com/wiki/Alien:_Covenant",
-            "image": null,
-            "description": "Disturbed pods rupture and release clouds of microscopic motes."
-        },
-        {
-            "id": "Spores infect Human",
-            "kind": "infection",
-            "source": "https://alienanthology.fandom.com/wiki/Alien:_Covenant",
-            "image": null,
-            "description": "Motes enter a human host, beginning a rapid parasitic incubation."
-        },
-        {
-            "id": "Bloodburster → Neomorph",
-            "kind": "maturation",
-            "source": "https://alienanthology.fandom.com/wiki/Alien:_Covenant",
-            "image": null,
-            "description": "Bloodburster quickly grows and differentiates into a Neomorph."
-        },
-        {
-            "id": "Experimental line",
-            "kind": "experiment",
-            "source": "https://alienanthology.fandom.com/wiki/Alien:_Covenant",
-            "image": null,
-            "description": "David's laboratory experimentation pathway leading to Protomorph variants."
-        },
-        {
-            "id": "Hatch (Proto)",
-            "kind": "maturation",
-            "source": "https://alienanthology.fandom.com/wiki/Protomorph",
-            "image": null,
-            "description": "Hatching event of a protohugger from a Protomorph egg in David's lab."
-        },
-        {
-            "id": "Implantation: Proto-Facehugger + Human",
-            "kind": "implantation",
-            "source": "https://alienanthology.fandom.com/wiki/Protomorph",
-            "image": null,
-            "description": "Rapid implantation of a human host by the proto facehugger variant."
-        },
-        {
-            "id": "Mature (Proto host)",
-            "kind": "maturation",
-            "source": "https://alienanthology.fandom.com/wiki/Protomorph",
-            "image": null,
-            "description": "Accelerated growth into an adult Protomorph after chestbursting."
-        },
-        {
-            "id": "Cloning (Resurrection)",
-            "kind": "cloning",
-            "source": "https://alienanthology.fandom.com/wiki/Alien:_Resurrection",
-            "image": null,
-            "description": "USM cloning program on the Auriga using mixed human/Queen DNA."
-        },
-        {
-            "id": "Queen live birth (clone context)",
-            "kind": "anomalous",
-            "source": "https://alienanthology.fandom.com/wiki/The_Newborn",
-            "image": null,
-            "description": "An anomalous reproductive event where the cloned Queen delivers a live hybrid."
-        },
-        {
-            "id": "Black Goo + Worms",
-            "kind": "infection",
-            "source": "https://alienanthology.fandom.com/wiki/Prometheus",
-            "image": null,
-            "description": "Local worms on LV-223 are mutated by the pathogen into Hammerpedes."
-        }
-    ],
-    "links": [
-        {
-            "source": "Queen",
-            "target": "Lay Egg",
-            "kind": "reproduction"
-        },
-        {
-            "source": "Lay Egg",
-            "target": "Egg (Ovomorph)",
-            "kind": "reproduction"
-        },
-        {
-            "source": "Egg (Ovomorph)",
-            "target": "Hatch Normal",
-            "kind": "maturation"
-        },
-        {
-            "source": "Hatch Normal",
-            "target": "Facehugger",
-            "kind": "maturation"
-        },
-        {
-            "source": "Egg (Ovomorph)",
-            "target": "Hatch Royal",
-            "kind": "maturation"
-        },
-        {
-            "source": "Hatch Royal",
-            "target": "Royal Facehugger",
-            "kind": "maturation"
-        },
-        {
-            "source": "Royal Facehugger",
-            "target": "Royal Implantation (Queen embryo)",
-            "kind": "implantation"
-        },
-        {
-            "source": "Human",
-            "target": "Royal Implantation (Queen embryo)",
-            "kind": "host"
-        },
-        {
-            "source": "Royal Implantation (Queen embryo)",
-            "target": "Chestburster",
-            "kind": "implantation"
-        },
-        {
-            "source": "Chestburster",
-            "target": "Queen",
-            "kind": "maturation"
-        },
-        {
-            "source": "Facehugger",
-            "target": "Implantation: Facehugger + Human",
-            "kind": "implantation"
-        },
-        {
-            "source": "Human",
-            "target": "Implantation: Facehugger + Human",
-            "kind": "host"
-        },
-        {
-            "source": "Implantation: Facehugger + Human",
-            "target": "Chestburster",
-            "kind": "implantation"
-        },
-        {
-            "source": "Chestburster",
-            "target": "Mature (Human host)",
-            "kind": "maturation"
-        },
-        {
-            "source": "Mature (Human host)",
-            "target": "Drone",
-            "kind": "maturation"
-        },
-        {
-            "source": "Mature (Human host)",
-            "target": "Warrior",
-            "kind": "maturation"
-        },
-        {
-            "source": "Facehugger",
-            "target": "Implantation: Facehugger + Dog",
-            "kind": "implantation"
-        },
-        {
-            "source": "Dog",
-            "target": "Implantation: Facehugger + Dog",
-            "kind": "host"
-        },
-        {
-            "source": "Implantation: Facehugger + Dog",
-            "target": "Chestburster",
-            "kind": "implantation"
-        },
-        {
-            "source": "Facehugger",
-            "target": "Implantation: Facehugger + Ox",
-            "kind": "implantation"
-        },
-        {
-            "source": "Ox",
-            "target": "Implantation: Facehugger + Ox",
-            "kind": "host"
-        },
-        {
-            "source": "Implantation: Facehugger + Ox",
-            "target": "Chestburster",
-            "kind": "implantation"
-        },
-        {
-            "source": "Chestburster",
-            "target": "Mature (Quadruped host)",
-            "kind": "maturation"
-        },
-        {
-            "source": "Mature (Quadruped host)",
-            "target": "Runner",
-            "kind": "maturation"
-        },
-        {
-            "source": "Drone",
-            "target": "Evolve: Drone → Praetorian",
-            "kind": "evolution"
-        },
-        {
-            "source": "Evolve: Drone → Praetorian",
-            "target": "Praetorian",
-            "kind": "evolution"
-        },
-        {
-            "source": "Praetorian",
-            "target": "Evolve: Praetorian → Queen",
-            "kind": "evolution"
-        },
-        {
-            "source": "Evolve: Praetorian → Queen",
-            "target": "Queen",
-            "kind": "evolution"
-        },
-        {
-            "source": "Drone",
-            "target": "Egg Morphing",
-            "kind": "biogenesis"
-        },
-        {
-            "source": "Cocooned Victim",
-            "target": "Egg Morphing",
-            "kind": "biogenesis"
-        },
-        {
-            "source": "Egg Morphing",
-            "target": "Egg (Ovomorph)",
-            "kind": "biogenesis"
-        },
-        {
-            "source": "Black Goo",
-            "target": "Black Goo + Human",
-            "kind": "infection"
-        },
-        {
-            "source": "Human",
-            "target": "Black Goo + Human",
-            "kind": "host"
-        },
-        {
-            "source": "Black Goo + Human",
-            "target": "Infected Human",
-            "kind": "infection"
-        },
-        {
-            "source": "Infected Human",
-            "target": "Parasitic transfer (sexual)",
-            "kind": "transmission"
-        },
-        {
-            "source": "Parasitic transfer (sexual)",
-            "target": "Trilobite",
-            "kind": "parasite"
-        },
-        {
-            "source": "Trilobite",
-            "target": "Trilobite + Engineer",
-            "kind": "impregnation"
-        },
-        {
-            "source": "Engineer",
-            "target": "Trilobite + Engineer",
-            "kind": "host"
-        },
-        {
-            "source": "Trilobite + Engineer",
-            "target": "Deacon",
-            "kind": "reproduction"
-        },
-        {
-            "source": "Black Goo",
-            "target": "Black Goo + Ecosystem",
-            "kind": "contaminate"
-        },
-        {
-            "source": "Black Goo + Ecosystem",
-            "target": "Pods (contaminated)",
-            "kind": "contaminate"
-        },
-        {
-            "source": "Pods (contaminated)",
-            "target": "Pods release Spores",
-            "kind": "release"
-        },
-        {
-            "source": "Pods release Spores",
-            "target": "Spores / Motes",
-            "kind": "release"
-        },
-        {
-            "source": "Spores / Motes",
-            "target": "Spores infect Human",
-            "kind": "infection"
-        },
-        {
-            "source": "Human",
-            "target": "Spores infect Human",
-            "kind": "host"
-        },
-        {
-            "source": "Spores infect Human",
-            "target": "Bloodburster",
-            "kind": "infection"
-        },
-        {
-            "source": "Bloodburster",
-            "target": "Bloodburster → Neomorph",
-            "kind": "maturation"
-        },
-        {
-            "source": "Bloodburster → Neomorph",
-            "target": "Neomorph",
-            "kind": "maturation"
-        },
-        {
-            "source": "Black Goo",
-            "target": "Experimental line",
-            "kind": "experiment"
-        },
-        {
-            "source": "Experimental line",
-            "target": "Protomorph Egg",
-            "kind": "experiment"
-        },
-        {
-            "source": "Protomorph Egg",
-            "target": "Hatch (Proto)",
-            "kind": "maturation"
-        },
-        {
-            "source": "Hatch (Proto)",
-            "target": "Proto-Facehugger",
-            "kind": "maturation"
-        },
-        {
-            "source": "Proto-Facehugger",
-            "target": "Implantation: Proto-Facehugger + Human",
-            "kind": "implantation"
-        },
-        {
-            "source": "Human",
-            "target": "Implantation: Proto-Facehugger + Human",
-            "kind": "host"
-        },
-        {
-            "source": "Implantation: Proto-Facehugger + Human",
-            "target": "Chestburster",
-            "kind": "implantation"
-        },
-        {
-            "source": "Chestburster",
-            "target": "Mature (Proto host)",
-            "kind": "maturation"
-        },
-        {
-            "source": "Mature (Proto host)",
-            "target": "Protomorph",
-            "kind": "maturation"
-        },
-        {
-            "source": "Black Goo",
-            "target": "Black Goo + Worms",
-            "kind": "infection"
-        },
-        {
-            "source": "Worms",
-            "target": "Black Goo + Worms",
-            "kind": "host"
-        },
-        {
-            "source": "Black Goo + Worms",
-            "target": "Hammerpede",
-            "kind": "infection"
-        },
-        {
-            "source": "Black Goo",
-            "target": "Experimental line",
-            "kind": "experiment"
-        },
-        {
-            "source": "Pregnant Human",
-            "target": "Experimental line",
-            "kind": "host"
-        },
-        {
-            "source": "Experimental line",
-            "target": "Offspring",
-            "kind": "result"
-        },
-        {
-            "source": "Queen",
-            "target": "Cloning (Resurrection)",
-            "kind": "cloning"
-        },
-        {
-            "source": "Human",
-            "target": "Cloning (Resurrection)",
-            "kind": "cloning"
-        },
-        {
-            "source": "Cloning (Resurrection)",
-            "target": "Cloned Queen (human DNA)",
-            "kind": "cloning"
-        },
-        {
-            "source": "Ellen Ripley (DNA)",
-            "target": "Cloning (Resurrection)",
-            "kind": "cloning"
-        },
-        {
-            "source": "Cloned Queen (human DNA)",
-            "target": "Queen live birth (clone context)",
-            "kind": "anomalous"
-        },
-        {
-            "source": "Queen live birth (clone context)",
-            "target": "Newborn",
-            "kind": "anomalous"
-        }
-    ],
-    "finalProducts": [
-        "Drone",
-        "Warrior",
-        "Runner",
-        "Queen",
-        "Neomorph",
-        "Protomorph",
-        "Deacon",
-        "Hammerpede",
-        "Offspring",
-        "Newborn"
-    ]
+  "title": "Alien Franchise — Cohesive Lifecycle Overview (Film Canon only; no AVP)",
+  "scope": "Classic hive, Engineer pathogen branches, and experimental lines (Resurrection, Romulus).",
+
+  "nodes": [
+    {
+      "id": "Human",
+      "type": "host",
+      "source": "https://alienanthology.fandom.com/wiki/Human",
+      "image": "https://static.wikia.nocookie.net/alienanthology/images/7/77/Kane_alien.jpg",
+      "description": "Baseline human host species frequently parasitized in the Alien films."
+    },
+    {
+      "id": "Dog",
+      "type": "host",
+      "source": "https://alienanthology.fandom.com/wiki/Alien³",
+      "image": "https://static.wikia.nocookie.net/alienanthology/images/2/2d/Spike.jpg",
+      "description": "Quadruped host from Alien 3 that produces a faster, runner-type xenomorph."
+    },
+    {
+      "id": "Ox",
+      "type": "host",
+      "source": "https://alienanthology.fandom.com/wiki/Alien³",
+      "image": "https://static.wikia.nocookie.net/alienanthology/images/5/5c/Ox_alien3.jpg",
+      "description": "Alternate quadruped host shown in the Assembly Cut of Alien 3."
+    },
+    {
+      "id": "Engineer",
+      "type": "host",
+      "source": "https://alienanthology.fandom.com/wiki/Engineer",
+      "image": "https://static.wikia.nocookie.net/alienanthology/images/a/ab/Engineer.jpg",
+      "description": "Ancient humanoid species linked to creation and bioweapons in Prometheus."
+    },
+    {
+      "id": "Pregnant Human",
+      "type": "host",
+      "source": "https://alienanthology.fandom.com/wiki/Alien:_Romulus",
+      "image": "https://static.wikia.nocookie.net/alienanthology/images/3/33/Romulus_pregnant_host.jpg",
+      "description": "A human host during pregnancy; used in an experimental line in Alien: Romulus."
+    },
+    {
+      "id": "Worms",
+      "type": "host",
+      "source": "https://alienanthology.fandom.com/wiki/Prometheus",
+      "image": "https://static.wikia.nocookie.net/alienanthology/images/e/ea/Prometheus_worms.jpg",
+      "description": "Small annelid-like organisms on LV-223 that mutate into Hammerpedes when exposed to the pathogen."
+    },
+    {
+      "id": "Ellen Ripley (DNA)",
+      "type": "artifact",
+      "source": "https://alienanthology.fandom.com/wiki/Ellen_Ripley",
+      "image": "https://static.wikia.nocookie.net/alienanthology/images/4/49/Ripley8.jpg",
+      "description": "Genetic sample used by the USM to clone Ripley and a gestating Queen in Alien: Resurrection."
+    },
+    {
+      "id": "Egg (Ovomorph)",
+      "type": "artifact",
+      "source": "https://alienanthology.fandom.com/wiki/Ovomorph",
+      "image": "https://static.wikia.nocookie.net/alienanthology/images/0/0e/Egg.jpg",
+      "description": "Leathery egg housing a Facehugger; typically laid by a Queen, with a fallback egg-morphing route."
+    },
+    {
+      "id": "Cocooned Victim",
+      "type": "artifact",
+      "source": "https://alienanthology.fandom.com/wiki/Ovomorph",
+      "image": "https://static.wikia.nocookie.net/alienanthology/images/2/28/BrettEgg.jpg",
+      "description": "Hosts encased and biotransformed into new Ovomorphs in the egg morphing process."
+    },
+    {
+      "id": "Pods (contaminated)",
+      "type": "artifact",
+      "source": "https://alienanthology.fandom.com/wiki/Alien:_Covenant",
+      "image": "https://static.wikia.nocookie.net/avp/images/a/ad/Egg_sack.png",
+      "description": "Fungal pods formed after pathogen contamination on Planet 4; rupture to release motes."
+    },
+    {
+      "id": "Protomorph Egg",
+      "type": "artifact",
+      "source": "https://alienanthology.fandom.com/wiki/Protomorph",
+      "image": "https://static.wikia.nocookie.net/avp/images/f/f2/Covenant_trailer_egg_%283%29.png",
+      "description": "Artificial ova cultured by David using the Engineer pathogen and local biomatter."
+    },
+    {
+      "id": "Spores / Motes",
+      "type": "vector",
+      "source": "https://avp.fandom.com/wiki/Motes",
+      "image": "https://static.wikia.nocookie.net/avp/images/8/8a/Motes.png",
+      "description": "Airborne motes from ruptured pods that infiltrate soft tissue and seed Neomorphs."
+    },
+    {
+      "id": "Facehugger",
+      "type": "stage",
+      "source": "https://alienanthology.fandom.com/wiki/Facehugger",
+      "image": "https://static.wikia.nocookie.net/alienanthology/images/a/ab/Facehugger-alien-aliens-8255454-473-300.jpg",
+      "description": "Parasitic life stage that attaches to a host and implants an embryo via proboscis."
+    },
+    {
+      "id": "Royal Facehugger",
+      "type": "stage",
+      "source": "https://alienanthology.fandom.com/wiki/Queen",
+      "image": "https://static.wikia.nocookie.net/alienanthology/images/d/d3/Royal_facehugger.jpg",
+      "description": "A rare variant carrying a Queen embryo, associated with royal implantation events."
+    },
+    {
+      "id": "Chestburster",
+      "type": "stage",
+      "source": "https://alienanthology.fandom.com/wiki/Chestburster",
+      "image": "https://static.wikia.nocookie.net/alienanthology/images/8/80/Alien-The_Chestburster.png",
+      "description": "Neonate stage that erupts from the host's thoracic cavity before rapid maturation."
+    },
+    {
+      "id": "Bloodburster",
+      "type": "stage",
+      "source": "https://avp.fandom.com/wiki/Bloodburster",
+      "image": "https://static.wikia.nocookie.net/avp/images/6/60/Baby_Neomorph_attacking_pose.png",
+      "description": "Early-stage organism produced by motes; rapidly matures into a Neomorph."
+    },
+    {
+      "id": "Proto-Facehugger",
+      "type": "stage",
+      "source": "https://alienanthology.fandom.com/wiki/Protomorph",
+      "image": "https://www.avpcentral.com/images/facehugger/protomorph-facehugger-on-oram.jpg",
+      "description": "Fast-acting facehugger variant from Protomorph eggs used by David in Alien: Covenant."
+    },
+    {
+      "id": "Drone",
+      "type": "species",
+      "source": "https://alienanthology.fandom.com/wiki/Drone",
+      "image": "https://static.wikia.nocookie.net/alienanthology/images/8/83/Sevastopol_Alien.jpg",
+      "description": "Adult xenomorph caste observed in Alien; stealthy hunter with biomechanical features."
+    },
+    {
+      "id": "Warrior",
+      "type": "species",
+      "source": "https://alienanthology.fandom.com/wiki/Soldier",
+      "image": "https://static.wikia.nocookie.net/alienanthology/images/d/d4/Aliens_still23.jpg",
+      "description": "Aggressive hive defenders seen in Aliens; sometimes referred to as Soldiers."
+    },
+    {
+      "id": "Runner",
+      "type": "species",
+      "source": "https://alienanthology.fandom.com/wiki/Runner",
+      "image": "https://static.wikia.nocookie.net/avp/images/4/48/Runner_2.PNG",
+      "description": "Quadrupedal xenomorph morphology arising from a dog/ox host in Alien 3."
+    },
+    {
+      "id": "Praetorian",
+      "type": "stage",
+      "source": "https://alienanthology.fandom.com/wiki/Royal_Guard",
+      "image": "https://static.wikia.nocookie.net/alienanthology/images/5/51/Xenomorph_Royal_Guard.jpg",
+      "description": "Intermediary royal caste that can develop into a Queen under specific conditions."
+    },
+    {
+      "id": "Queen",
+      "type": "species",
+      "source": "https://alienanthology.fandom.com/wiki/Queen",
+      "image": "https://static.wikia.nocookie.net/alienanthology/images/a/a4/Aliens_Queen.jpg",
+      "description": "Egg-laying hive matriarch responsible for producing Ovomorphs."
+    },
+    {
+      "id": "Neomorph",
+      "type": "species",
+      "source": "https://avp.fandom.com/wiki/Neomorph",
+      "image": "https://static.wikia.nocookie.net/avp/images/d/d2/The_Neomorph_%2810%29.png",
+      "description": "Pale, spindly organism produced by motes infecting human hosts in Alien: Covenant."
+    },
+    {
+      "id": "Protomorph",
+      "type": "species",
+      "source": "https://alienanthology.fandom.com/wiki/Protomorph",
+      "image": "https://static.wikia.nocookie.net/alienanthology/images/1/19/Praetomorph-closeup.jpg",
+      "description": "Xenomorph-like organism resulting from David's engineered line in Alien: Covenant."
+    },
+    {
+      "id": "Deacon",
+      "type": "species",
+      "source": "https://alienanthology.fandom.com/wiki/The_Deacon",
+      "image": "https://static.wikia.nocookie.net/alienanthology/images/c/ca/ProtoAlien.jpg",
+      "description": "Proto-xenomorph born from a Trilobite implanting an Engineer in Prometheus."
+    },
+    {
+      "id": "Newborn",
+      "type": "hybrid",
+      "source": "https://alienanthology.fandom.com/wiki/The_Newborn",
+      "image": "https://static.wikia.nocookie.net/alienanthology/images/6/63/Newborn_profile.jpg",
+      "description": "Human–xenomorph hybrid live-born from the cloned Queen in Alien: Resurrection."
+    },
+    {
+      "id": "Cloned Queen (human DNA)",
+      "type": "species",
+      "source": "https://alienanthology.fandom.com/wiki/Cloned_Queen",
+      "image": "https://static.wikia.nocookie.net/alienanthology/images/1/17/Alien_Resurrection_Queen1.jpg",
+      "description": "Queen produced via cloning with mixed human/xenomorph DNA, exhibiting reproductive anomalies."
+    },
+    {
+      "id": "Black Goo",
+      "type": "agent",
+      "source": "https://alienanthology.fandom.com/wiki/Chemical_A0-3959X.91_%E2%80%93_15",
+      "image": "https://static.wikia.nocookie.net/alienanthology/images/6/6c/Prometheus_pathogen.jpg",
+      "description": "Engineer bioweapon/pathogen that rewrites biology and triggers aggressive morphogenesis."
+    },
+    {
+      "id": "Infected Human",
+      "type": "organism",
+      "source": "https://alienanthology.fandom.com/wiki/Prometheus",
+      "image": "https://static.wikia.nocookie.net/avp/images/5/5d/58264088.jpg",
+      "description": "Human altered by exposure to the pathogen, enabling secondary parasitic outcomes."
+    },
+    {
+      "id": "Trilobite",
+      "type": "organism",
+      "source": "https://alienanthology.fandom.com/wiki/The_Trilobite",
+      "image": "https://static.wikia.nocookie.net/alienanthology/images/3/31/BabyTrilobite.jpg",
+  "description": "The Trilobite was a strange creature created as the result of the black liquid infecting Holloway and he impregnating Elizabeth Shaw during sex, despite her infertility. It is not made clear if the creature was conceived by the pair or if the infant creature merely moved into Shaw from the infected Holloway."
+    },
+    {
+      "id": "Hammerpede",
+      "type": "organism",
+      "source": "https://alienanthology.fandom.com/wiki/Hammerpede",
+      "image": "https://static.wikia.nocookie.net/alienanthology/images/8/8d/Promethues_Snakes.png",
+      "description": "Aggressive serpentine organism created when local worms are mutated by the pathogen."
+    },
+    {
+      "id": "Offspring",
+      "type": "organism",
+      "source": "https://avp.fandom.com/wiki/Offspring",
+      "image": "https://static.wikia.nocookie.net/alienanthology/images/4/43/Romulus_offspring.jpg",
+      "description": "Human–xenomorph hybrid birthed by Kay Harrison after experimental exposure (Alien: Romulus)."
+    }
+  ],
+  "processes": [
+    {
+      "id": "Lay Egg",
+      "kind": "reproduction",
+      "source": "https://alienanthology.fandom.com/wiki/Ovomorph",
+      "image": null,
+      "description": "Queen produces Ovomorphs within a hive; each typically contains a Facehugger."
+    },
+    {
+      "id": "Hatch Normal",
+      "kind": "maturation",
+      "source": "https://alienanthology.fandom.com/wiki/Facehugger",
+      "image": null,
+      "description": "Standard hatching event where an Ovomorph opens and a Facehugger emerges."
+    },
+    {
+      "id": "Hatch Royal",
+      "kind": "maturation",
+      "source": "https://alienanthology.fandom.com/wiki/Queen",
+      "image": null,
+      "description": "Hatching that yields a royal facehugger carrying a Queen embryo."
+    },
+    {
+      "id": "Egg Morphing",
+      "kind": "biogenesis",
+      "source": "https://en.wikipedia.org/wiki/Xenomorph#Egg",
+      "image": null,
+      "description": "Fallback route observed in Alien (1979 Director's Cut): cocooned hosts become eggs."
+    },
+    {
+      "id": "Implantation: Facehugger + Human",
+      "kind": "implantation",
+      "source": "https://alienanthology.fandom.com/wiki/Facehugger",
+      "image": null,
+      "description": "Facehugger attaches to a human and implants an embryo that later chestbursts."
+    },
+    {
+      "id": "Implantation: Facehugger + Dog",
+      "kind": "implantation",
+      "source": "https://alienanthology.fandom.com/wiki/Alien³",
+      "image": null,
+      "description": "Implantation into a canine host, leading to a quadruped morphology."
+    },
+    {
+      "id": "Implantation: Facehugger + Ox",
+      "kind": "implantation",
+      "source": "https://alienanthology.fandom.com/wiki/Alien³",
+      "image": null,
+      "description": "Implantation into a bovine host, as depicted in the Assembly Cut."
+    },
+    {
+      "id": "Royal Implantation (Queen embryo)",
+      "kind": "implantation",
+      "source": "https://alienanthology.fandom.com/wiki/Queen",
+      "image": null,
+      "description": "A royal facehugger implants a Queen embryo into a suitable host."
+    },
+    {
+      "id": "Mature (Human host)",
+      "kind": "maturation",
+      "source": "https://alienanthology.fandom.com/wiki/Xenomorph_XX121",
+      "image": null,
+      "description": "Standard maturation from chestburster to adult when the host is human."
+    },
+    {
+      "id": "Mature (Quadruped host)",
+      "kind": "maturation",
+      "source": "https://alienanthology.fandom.com/wiki/Runner",
+      "image": null,
+      "description": "Maturation pathway producing a runner-type organism from a quadruped host."
+    },
+    {
+      "id": "Evolve: Drone → Praetorian",
+      "kind": "evolution",
+      "source": "https://alienanthology.fandom.com/wiki/Royal_Guard",
+      "image": null,
+      "description": "Under certain conditions, a Drone can develop into a Praetorian."
+    },
+    {
+      "id": "Evolve: Praetorian → Queen",
+      "kind": "evolution",
+      "source": "https://alienanthology.fandom.com/wiki/Queen",
+      "image": null,
+      "description": "A Praetorian can advance further to become a Queen."
+    },
+    {
+      "id": "Black Goo + Human",
+      "kind": "infection",
+      "source": "https://alienanthology.fandom.com/wiki/Chemical_A0-3959X.91_%E2%80%93_15",
+      "image": null,
+      "description": "Exposure of a human to the pathogen, triggering radical biological changes."
+    },
+    {
+      "id": "Parasitic transfer (sexual)",
+      "kind": "transmission",
+      "source": "https://alienanthology.fandom.com/wiki/Prometheus",
+      "image": null,
+      "description": "Secondary transfer of infection from an altered human to a partner."
+    },
+    {
+      "id": "Trilobite + Engineer",
+      "kind": "impregnation",
+      "source": "https://alienanthology.fandom.com/wiki/Prometheus",
+      "image": null,
+      "description": "Trilobite restrains and implants an Engineer, resulting in the Deacon."
+    },
+    {
+      "id": "Black Goo + Ecosystem",
+      "kind": "contaminate",
+      "source": "https://alienanthology.fandom.com/wiki/Alien:_Covenant",
+      "image": null,
+      "description": "Pathogen dispersal across local flora and fauna leading to pod formation."
+    },
+    {
+      "id": "Pods release Spores",
+      "kind": "release",
+      "source": "https://alienanthology.fandom.com/wiki/Alien:_Covenant",
+      "image": null,
+      "description": "Disturbed pods rupture and release clouds of microscopic motes."
+    },
+    {
+      "id": "Spores infect Human",
+      "kind": "infection",
+      "source": "https://alienanthology.fandom.com/wiki/Alien:_Covenant",
+      "image": null,
+      "description": "Motes enter a human host, beginning a rapid parasitic incubation."
+    },
+    {
+      "id": "Bloodburster → Neomorph",
+      "kind": "maturation",
+      "source": "https://alienanthology.fandom.com/wiki/Alien:_Covenant",
+      "image": null,
+      "description": "Bloodburster quickly grows and differentiates into a Neomorph."
+    },
+    {
+      "id": "Experimental line",
+      "kind": "experiment",
+      "source": "https://alienanthology.fandom.com/wiki/Alien:_Covenant",
+      "image": null,
+      "description": "David's laboratory experimentation pathway leading to Protomorph variants."
+    },
+    {
+      "id": "Hatch (Proto)",
+      "kind": "maturation",
+      "source": "https://alienanthology.fandom.com/wiki/Protomorph",
+      "image": null,
+      "description": "Hatching event of a protohugger from a Protomorph egg in David's lab."
+    },
+    {
+      "id": "Implantation: Proto-Facehugger + Human",
+      "kind": "implantation",
+      "source": "https://alienanthology.fandom.com/wiki/Protomorph",
+      "image": null,
+      "description": "Rapid implantation of a human host by the proto facehugger variant."
+    },
+    {
+      "id": "Mature (Proto host)",
+      "kind": "maturation",
+      "source": "https://alienanthology.fandom.com/wiki/Protomorph",
+      "image": null,
+      "description": "Accelerated growth into an adult Protomorph after chestbursting."
+    },
+    {
+      "id": "Cloning (Resurrection)",
+      "kind": "cloning",
+      "source": "https://alienanthology.fandom.com/wiki/Alien:_Resurrection",
+      "image": null,
+      "description": "USM cloning program on the Auriga using mixed human/Queen DNA."
+    },
+    {
+      "id": "Queen live birth (clone context)",
+      "kind": "anomalous",
+      "source": "https://alienanthology.fandom.com/wiki/The_Newborn",
+      "image": null,
+      "description": "An anomalous reproductive event where the cloned Queen delivers a live hybrid."
+    },
+    {
+      "id": "Black Goo + Worms",
+      "kind": "infection",
+      "source": "https://alienanthology.fandom.com/wiki/Prometheus",
+      "image": null,
+      "description": "Local worms on LV-223 are mutated by the pathogen into Hammerpedes."
+    }
+  ],
+  "links": [
+    {
+      "source": "Queen",
+      "target": "Lay Egg",
+      "kind": "reproduction"
+    },
+    {
+      "source": "Lay Egg",
+      "target": "Egg (Ovomorph)",
+      "kind": "reproduction"
+    },
+    {
+      "source": "Egg (Ovomorph)",
+      "target": "Hatch Normal",
+      "kind": "maturation"
+    },
+    {
+      "source": "Hatch Normal",
+      "target": "Facehugger",
+      "kind": "maturation"
+    },
+    {
+      "source": "Egg (Ovomorph)",
+      "target": "Hatch Royal",
+      "kind": "maturation"
+    },
+    {
+      "source": "Hatch Royal",
+      "target": "Royal Facehugger",
+      "kind": "maturation"
+    },
+    {
+      "source": "Royal Facehugger",
+      "target": "Royal Implantation (Queen embryo)",
+      "kind": "implantation"
+    },
+    {
+      "source": "Human",
+      "target": "Royal Implantation (Queen embryo)",
+      "kind": "host"
+    },
+    {
+      "source": "Royal Implantation (Queen embryo)",
+      "target": "Chestburster",
+      "kind": "implantation"
+    },
+    {
+      "source": "Chestburster",
+      "target": "Queen",
+      "kind": "maturation"
+    },
+    {
+      "source": "Facehugger",
+      "target": "Implantation: Facehugger + Human",
+      "kind": "implantation"
+    },
+    {
+      "source": "Human",
+      "target": "Implantation: Facehugger + Human",
+      "kind": "host"
+    },
+    {
+      "source": "Implantation: Facehugger + Human",
+      "target": "Chestburster",
+      "kind": "implantation"
+    },
+    {
+      "source": "Chestburster",
+      "target": "Mature (Human host)",
+      "kind": "maturation"
+    },
+    {
+      "source": "Mature (Human host)",
+      "target": "Drone",
+      "kind": "maturation"
+    },
+    {
+      "source": "Mature (Human host)",
+      "target": "Warrior",
+      "kind": "maturation"
+    },
+    {
+      "source": "Facehugger",
+      "target": "Implantation: Facehugger + Dog",
+      "kind": "implantation"
+    },
+    {
+      "source": "Dog",
+      "target": "Implantation: Facehugger + Dog",
+      "kind": "host"
+    },
+    {
+      "source": "Implantation: Facehugger + Dog",
+      "target": "Chestburster",
+      "kind": "implantation"
+    },
+    {
+      "source": "Facehugger",
+      "target": "Implantation: Facehugger + Ox",
+      "kind": "implantation"
+    },
+    {
+      "source": "Ox",
+      "target": "Implantation: Facehugger + Ox",
+      "kind": "host"
+    },
+    {
+      "source": "Implantation: Facehugger + Ox",
+      "target": "Chestburster",
+      "kind": "implantation"
+    },
+    {
+      "source": "Chestburster",
+      "target": "Mature (Quadruped host)",
+      "kind": "maturation"
+    },
+    {
+      "source": "Mature (Quadruped host)",
+      "target": "Runner",
+      "kind": "maturation"
+    },
+    {
+      "source": "Drone",
+      "target": "Evolve: Drone → Praetorian",
+      "kind": "evolution"
+    },
+    {
+      "source": "Evolve: Drone → Praetorian",
+      "target": "Praetorian",
+      "kind": "evolution"
+    },
+    {
+      "source": "Praetorian",
+      "target": "Evolve: Praetorian → Queen",
+      "kind": "evolution"
+    },
+    {
+      "source": "Evolve: Praetorian → Queen",
+      "target": "Queen",
+      "kind": "evolution"
+    },
+    {
+      "source": "Drone",
+      "target": "Egg Morphing",
+      "kind": "biogenesis"
+    },
+    {
+      "source": "Cocooned Victim",
+      "target": "Egg Morphing",
+      "kind": "biogenesis"
+    },
+    {
+      "source": "Egg Morphing",
+      "target": "Egg (Ovomorph)",
+      "kind": "biogenesis"
+    },
+    {
+      "source": "Black Goo",
+      "target": "Black Goo + Human",
+      "kind": "infection"
+    },
+    {
+      "source": "Human",
+      "target": "Black Goo + Human",
+      "kind": "host"
+    },
+    {
+      "source": "Black Goo + Human",
+      "target": "Infected Human",
+      "kind": "infection"
+    },
+    {
+      "source": "Infected Human",
+      "target": "Parasitic transfer (sexual)",
+      "kind": "transmission"
+    },
+    {
+      "source": "Parasitic transfer (sexual)",
+      "target": "Trilobite",
+      "kind": "parasite"
+    },
+    {
+      "source": "Trilobite",
+      "target": "Trilobite + Engineer",
+      "kind": "impregnation"
+    },
+    {
+      "source": "Engineer",
+      "target": "Trilobite + Engineer",
+      "kind": "host"
+    },
+    {
+      "source": "Trilobite + Engineer",
+      "target": "Deacon",
+      "kind": "reproduction"
+    },
+    {
+      "source": "Black Goo",
+      "target": "Black Goo + Ecosystem",
+      "kind": "contaminate"
+    },
+    {
+      "source": "Black Goo + Ecosystem",
+      "target": "Pods (contaminated)",
+      "kind": "contaminate"
+    },
+    {
+      "source": "Pods (contaminated)",
+      "target": "Pods release Spores",
+      "kind": "release"
+    },
+    {
+      "source": "Pods release Spores",
+      "target": "Spores / Motes",
+      "kind": "release"
+    },
+    {
+      "source": "Spores / Motes",
+      "target": "Spores infect Human",
+      "kind": "infection"
+    },
+    {
+      "source": "Human",
+      "target": "Spores infect Human",
+      "kind": "host"
+    },
+    {
+      "source": "Spores infect Human",
+      "target": "Bloodburster",
+      "kind": "infection"
+    },
+    {
+      "source": "Bloodburster",
+      "target": "Bloodburster → Neomorph",
+      "kind": "maturation"
+    },
+    {
+      "source": "Bloodburster → Neomorph",
+      "target": "Neomorph",
+      "kind": "maturation"
+    },
+    {
+      "source": "Black Goo",
+      "target": "Experimental line",
+      "kind": "experiment"
+    },
+    {
+      "source": "Experimental line",
+      "target": "Protomorph Egg",
+      "kind": "experiment"
+    },
+    {
+      "source": "Protomorph Egg",
+      "target": "Hatch (Proto)",
+      "kind": "maturation"
+    },
+    {
+      "source": "Hatch (Proto)",
+      "target": "Proto-Facehugger",
+      "kind": "maturation"
+    },
+    {
+      "source": "Proto-Facehugger",
+      "target": "Implantation: Proto-Facehugger + Human",
+      "kind": "implantation"
+    },
+    {
+      "source": "Human",
+      "target": "Implantation: Proto-Facehugger + Human",
+      "kind": "host"
+    },
+    {
+      "source": "Implantation: Proto-Facehugger + Human",
+      "target": "Chestburster",
+      "kind": "implantation"
+    },
+    {
+      "source": "Chestburster",
+      "target": "Mature (Proto host)",
+      "kind": "maturation"
+    },
+    {
+      "source": "Mature (Proto host)",
+      "target": "Protomorph",
+      "kind": "maturation"
+    },
+    {
+      "source": "Black Goo",
+      "target": "Black Goo + Worms",
+      "kind": "infection"
+    },
+    {
+      "source": "Worms",
+      "target": "Black Goo + Worms",
+      "kind": "host"
+    },
+    {
+      "source": "Black Goo + Worms",
+      "target": "Hammerpede",
+      "kind": "infection"
+    },
+    {
+      "source": "Black Goo",
+      "target": "Experimental line",
+      "kind": "experiment"
+    },
+    {
+      "source": "Pregnant Human",
+      "target": "Experimental line",
+      "kind": "host"
+    },
+    {
+      "source": "Experimental line",
+      "target": "Offspring",
+      "kind": "result"
+    },
+    {
+      "source": "Queen",
+      "target": "Cloning (Resurrection)",
+      "kind": "cloning"
+    },
+    {
+      "source": "Human",
+      "target": "Cloning (Resurrection)",
+      "kind": "cloning"
+    },
+    {
+      "source": "Cloning (Resurrection)",
+      "target": "Cloned Queen (human DNA)",
+      "kind": "cloning"
+    },
+    {
+      "source": "Ellen Ripley (DNA)",
+      "target": "Cloning (Resurrection)",
+      "kind": "cloning"
+    },
+    {
+      "source": "Cloned Queen (human DNA)",
+      "target": "Queen live birth (clone context)",
+      "kind": "anomalous"
+    },
+    {
+      "source": "Queen live birth (clone context)",
+      "target": "Newborn",
+      "kind": "anomalous"
+    }
+  ],
+  "finalProducts": [
+    "Drone",
+    "Warrior",
+    "Runner",
+    "Queen",
+    "Neomorph",
+  "Trilobite",
+    "Protomorph",
+    "Deacon",
+    "Hammerpede",
+    "Offspring",
+    "Newborn"
+  ]
 }
