@@ -1,152 +1,559 @@
 {
-  "nodes": [
-    { "id": "Human", "type": "host" },
-    { "id": "Dog", "type": "host" },
-    { "id": "Ox", "type": "host" },
-    { "id": "Cat", "type": "host" },
-    { "id": "Engineer", "type": "host" },
-    { "id": "Pregnant Human", "type": "host" },
-
-    { "id": "Black Goo", "type": "agent" },
-    { "id": "Pods (contaminated)", "type": "artifact" },
-    { "id": "Spores / Motes", "type": "vector" },
-    { "id": "Egg (Ovomorph)", "type": "artifact" },
-    { "id": "Cocooned Victim", "type": "artifact" },
-
-    { "id": "Facehugger", "type": "stage" },
-    { "id": "Royal Facehugger", "type": "stage" },
-    { "id": "Chestburster", "type": "stage" },
-    { "id": "Drone", "type": "species" },
-    { "id": "Warrior", "type": "species" },
-    { "id": "Runner", "type": "species" },
-    { "id": "Praetorian", "type": "stage" },
-    { "id": "Queen", "type": "species" },
-    { "id": "Cloned Queen (human DNA)", "type": "species" },
-    { "id": "Newborn", "type": "hybrid" },
-    { "id": "Trilobite", "type": "organism" },
-    { "id": "Deacon", "type": "species" },
-    { "id": "Bloodburster", "type": "stage" },
-    { "id": "Neomorph", "type": "species" },
-    { "id": "Protomorph", "type": "species" },
-    { "id": "Offspring", "type": "hybrid" },
-    { "id": "Trypanohyncha Ocellus", "type": "species" },
-    { "id": "Ocellus-controlled Host", "type": "organism" },
-    { "id": "Unidentified Leech Species", "type": "species" },
-    { "id": "Leech-parasitized Host", "type": "organism" },
-    { "id": "Tadpole-like larva (P. praepotens)", "type": "stage" },
-    { "id": "D. Plumbicare", "type": "species" },
-    { "id": "Infected Human", "type": "organism" }
-  ],
-  "processes": [
-    { "id": "Egg Morphing" },
-    { "id": "Lay Egg" },
-    { "id": "Hatch Normal" },
-    { "id": "Hatch Royal" },
-    { "id": "Implantation: Facehugger + Human" },
-    { "id": "Implantation: Facehugger + Dog" },
-    { "id": "Implantation: Facehugger + Ox" },
-    { "id": "Royal Implantation (Queen embryo)" },
-    { "id": "Facehugger injects tadpole-like larva" },
-    { "id": "Mature (Human host)" },
-    { "id": "Mature (Quadruped host)" },
-    { "id": "Evolve: Drone → Praetorian" },
-    { "id": "Evolve: Praetorian → Queen" },
-    { "id": "Black Goo + Human" },
-    { "id": "Black Goo + Ecosystem" },
-    { "id": "Pods release Spores" },
-    { "id": "Spores infect Human" },
-    { "id": "Bloodburster → Neomorph" },
-    { "id": "Infected Human → Trilobite" },
-    { "id": "Trilobite + Engineer" },
-    { "id": "Experimental line" },
-    { "id": "Cloning (Resurrection)" },
-    { "id": "Queen live birth (clone context)" },
-    { "id": "Ocellus ocular takeover" },
-    { "id": "Leech attachment" }
-  ],
-  "links": [
-    { "source": "Queen", "target": "Lay Egg", "kind": "reproduction" },
-    { "source": "Lay Egg", "target": "Egg (Ovomorph)", "kind": "reproduction" },
-
-    { "source": "Egg (Ovomorph)", "target": "Hatch Normal", "kind": "maturation" },
-    { "source": "Hatch Normal", "target": "Facehugger", "kind": "maturation" },
-
-    { "source": "Egg (Ovomorph)", "target": "Hatch Royal", "kind": "maturation" },
-    { "source": "Hatch Royal", "target": "Royal Facehugger", "kind": "maturation" },
-
-    { "source": "Royal Facehugger", "target": "Royal Implantation (Queen embryo)", "kind": "implantation" },
-    { "source": "Human", "target": "Royal Implantation (Queen embryo)", "kind": "host" },
-    { "source": "Royal Implantation (Queen embryo)", "target": "Chestburster", "kind": "implantation" },
-    { "source": "Chestburster", "target": "Queen", "kind": "maturation" },
-
-    { "source": "Facehugger", "target": "Implantation: Facehugger + Human", "kind": "implantation" },
-    { "source": "Human", "target": "Implantation: Facehugger + Human", "kind": "host" },
-    { "source": "Implantation: Facehugger + Human", "target": "Facehugger injects tadpole-like larva", "kind": "gestation" },
-    { "source": "Facehugger injects tadpole-like larva", "target": "Tadpole-like larva (P. praepotens)", "kind": "gestation" },
-    { "source": "Tadpole-like larva (P. praepotens)", "target": "Chestburster", "kind": "maturation" },
-    { "source": "Chestburster", "target": "Mature (Human host)", "kind": "maturation" },
-    { "source": "Mature (Human host)", "target": "Drone", "kind": "maturation" },
-    { "source": "Mature (Human host)", "target": "Warrior", "kind": "maturation" },
-
-    { "source": "Facehugger", "target": "Implantation: Facehugger + Dog", "kind": "implantation" },
-    { "source": "Dog", "target": "Implantation: Facehugger + Dog", "kind": "host" },
-    { "source": "Implantation: Facehugger + Dog", "target": "Chestburster", "kind": "implantation" },
-    { "source": "Chestburster", "target": "Mature (Quadruped host)", "kind": "maturation" },
-    { "source": "Mature (Quadruped host)", "target": "Runner", "kind": "maturation" },
-
-    { "source": "Facehugger", "target": "Implantation: Facehugger + Ox", "kind": "implantation" },
-    { "source": "Ox", "target": "Implantation: Facehugger + Ox", "kind": "host" },
-    { "source": "Implantation: Facehugger + Ox", "target": "Chestburster", "kind": "implantation" },
-    { "source": "Ox", "target": "Mature (Quadruped host)", "kind": "host" },
-
-    { "source": "Drone", "target": "Evolve: Drone → Praetorian", "kind": "evolution" },
-    { "source": "Evolve: Drone → Praetorian", "target": "Praetorian", "kind": "evolution" },
-    { "source": "Praetorian", "target": "Evolve: Praetorian → Queen", "kind": "evolution" },
-    { "source": "Evolve: Praetorian → Queen", "target": "Queen", "kind": "evolution" },
-
-    { "source": "Drone", "target": "Egg Morphing", "kind": "biogenesis" },
-    { "source": "Cocooned Victim", "target": "Egg Morphing", "kind": "biogenesis" },
-    { "source": "Egg Morphing", "target": "Egg (Ovomorph)", "kind": "biogenesis" },
-
-    { "source": "Black Goo", "target": "Black Goo + Human", "kind": "infection" },
-    { "source": "Human", "target": "Black Goo + Human", "kind": "host" },
-    { "source": "Black Goo + Human", "target": "Infected Human", "kind": "infection" },
-    { "source": "Infected Human", "target": "Infected Human → Trilobite", "kind": "transmission" },
-    { "source": "Infected Human → Trilobite", "target": "Trilobite", "kind": "parasite" },
-    { "source": "Trilobite", "target": "Trilobite + Engineer", "kind": "impregnation" },
-    { "source": "Engineer", "target": "Trilobite + Engineer", "kind": "host" },
-    { "source": "Trilobite + Engineer", "target": "Deacon", "kind": "reproduction" },
-
-    { "source": "Black Goo", "target": "Black Goo + Ecosystem", "kind": "contaminate" },
-    { "source": "Black Goo + Ecosystem", "target": "Pods (contaminated)", "kind": "contaminate" },
-    { "source": "Pods (contaminated)", "target": "Pods release Spores", "kind": "release" },
-    { "source": "Pods release Spores", "target": "Spores / Motes", "kind": "release" },
-    { "source": "Spores / Motes", "target": "Spores infect Human", "kind": "infection" },
-    { "source": "Human", "target": "Spores infect Human", "kind": "host" },
-    { "source": "Spores infect Human", "target": "Bloodburster", "kind": "infection" },
-    { "source": "Bloodburster", "target": "Bloodburster → Neomorph", "kind": "maturation" },
-    { "source": "Bloodburster → Neomorph", "target": "Neomorph", "kind": "maturation" },
-
-    { "source": "Black Goo", "target": "Experimental line", "kind": "experiment" },
-    { "source": "Experimental line", "target": "Protomorph", "kind": "experiment" },
-
-    { "source": "Queen", "target": "Cloning (Resurrection)", "kind": "cloning" },
-    { "source": "Human", "target": "Cloning (Resurrection)", "kind": "cloning" },
-    { "source": "Cloning (Resurrection)", "target": "Cloned Queen (human DNA)", "kind": "cloning" },
-    { "source": "Cloned Queen (human DNA)", "target": "Queen live birth (clone context)", "kind": "anomalous" },
-    { "source": "Queen live birth (clone context)", "target": "Newborn", "kind": "anomalous" },
-
-    { "source": "Black Goo", "target": "Experimental line", "kind": "experiment" },
-    { "source": "Pregnant Human", "target": "Experimental line", "kind": "host" },
-    { "source": "Experimental line", "target": "Offspring", "kind": "result" },
-
-    { "source": "Trypanohyncha Ocellus", "target": "Ocellus ocular takeover", "kind": "parasitism" },
-    { "source": "Human", "target": "Ocellus ocular takeover", "kind": "host" },
-    { "source": "Cat", "target": "Ocellus ocular takeover", "kind": "host" },
-    { "source": "Ocellus ocular takeover", "target": "Ocellus-controlled Host", "kind": "parasite" },
-
-    { "source": "Unidentified Leech Species", "target": "Leech attachment", "kind": "parasitism" },
-    { "source": "Human", "target": "Leech attachment", "kind": "host" },
-    { "source": "Leech attachment", "target": "Leech-parasitized Host", "kind": "parasite" }
-  ]
+    "nodes": [
+        {
+            "id": "Human",
+            "type": "host"
+        },
+        {
+            "id": "Dog",
+            "type": "host"
+        },
+        {
+            "id": "Ox",
+            "type": "host"
+        },
+        {
+            "id": "Cat",
+            "type": "host"
+        },
+        {
+            "id": "Engineer",
+            "type": "host"
+        },
+        {
+            "id": "Pregnant Human",
+            "type": "host"
+        },
+        {
+            "id": "Black Goo",
+            "type": "agent"
+        },
+        {
+            "id": "Pods (contaminated)",
+            "type": "artifact"
+        },
+        {
+            "id": "Spores / Motes",
+            "type": "vector"
+        },
+        {
+            "id": "Egg (Ovomorph)",
+            "type": "artifact"
+        },
+        {
+            "id": "Cocooned Victim",
+            "type": "artifact"
+        },
+        {
+            "id": "Facehugger",
+            "type": "stage"
+        },
+        {
+            "id": "Royal Facehugger",
+            "type": "stage"
+        },
+        {
+            "id": "Chestburster",
+            "type": "stage"
+        },
+        {
+            "id": "Drone",
+            "type": "species"
+        },
+        {
+            "id": "Warrior",
+            "type": "species"
+        },
+        {
+            "id": "Runner",
+            "type": "species"
+        },
+        {
+            "id": "Praetorian",
+            "type": "stage"
+        },
+        {
+            "id": "Queen",
+            "type": "species"
+        },
+        {
+            "id": "Cloned Queen (human DNA)",
+            "type": "species"
+        },
+        {
+            "id": "Newborn",
+            "type": "hybrid"
+        },
+        {
+            "id": "Trilobite",
+            "type": "organism"
+        },
+        {
+            "id": "Deacon",
+            "type": "species"
+        },
+        {
+            "id": "Bloodburster",
+            "type": "stage"
+        },
+        {
+            "id": "Neomorph",
+            "type": "species"
+        },
+        {
+            "id": "Protomorph",
+            "type": "species"
+        },
+        {
+            "id": "Offspring",
+            "type": "hybrid"
+        },
+        {
+            "id": "Trypanohyncha Ocellus",
+            "type": "species"
+        },
+        {
+            "id": "Ocellus-controlled Host",
+            "type": "organism"
+        },
+        {
+            "id": "Unidentified Leech Species",
+            "type": "species"
+        },
+        {
+            "id": "Leech-parasitized Host",
+            "type": "organism"
+        },
+        {
+            "id": "Tadpole-like larva (P. praepotens)",
+            "type": "stage"
+        },
+        {
+            "id": "D. Plumbicare",
+            "type": "species"
+        },
+        {
+            "id": "Infected Human",
+            "type": "organism"
+        }
+    ],
+    "processes": [
+        {
+            "id": "Egg Morphing"
+        },
+        {
+            "id": "Lay Egg"
+        },
+        {
+            "id": "Hatch Normal"
+        },
+        {
+            "id": "Hatch Royal"
+        },
+        {
+            "id": "Implantation: Facehugger + Human"
+        },
+        {
+            "id": "Implantation: Facehugger + Dog"
+        },
+        {
+            "id": "Implantation: Facehugger + Ox"
+        },
+        {
+            "id": "Royal Implantation (Queen embryo)"
+        },
+        {
+            "id": "Facehugger injects tadpole-like larva"
+        },
+        {
+            "id": "Mature (Human host)"
+        },
+        {
+            "id": "Mature (Quadruped host)"
+        },
+        {
+            "id": "Evolve: Drone → Praetorian"
+        },
+        {
+            "id": "Evolve: Praetorian → Queen"
+        },
+        {
+            "id": "Black Goo + Human"
+        },
+        {
+            "id": "Black Goo + Ecosystem"
+        },
+        {
+            "id": "Pods release Spores"
+        },
+        {
+            "id": "Spores infect Human"
+        },
+        {
+            "id": "Bloodburster → Neomorph"
+        },
+        {
+            "id": "Infected Human → Trilobite"
+        },
+        {
+            "id": "Trilobite + Engineer"
+        },
+        {
+            "id": "Experimental line"
+        },
+        {
+            "id": "Cloning (Resurrection)"
+        },
+        {
+            "id": "Queen live birth (clone context)"
+        },
+        {
+            "id": "Ocellus ocular takeover"
+        },
+        {
+            "id": "Leech attachment"
+        }
+    ],
+    "links": [
+        {
+            "source": "Queen",
+            "target": "Lay Egg",
+            "kind": "reproduction"
+        },
+        {
+            "source": "Lay Egg",
+            "target": "Egg (Ovomorph)",
+            "kind": "reproduction"
+        },
+        {
+            "source": "Egg (Ovomorph)",
+            "target": "Hatch Normal",
+            "kind": "maturation"
+        },
+        {
+            "source": "Hatch Normal",
+            "target": "Facehugger",
+            "kind": "maturation"
+        },
+        {
+            "source": "Egg (Ovomorph)",
+            "target": "Hatch Royal",
+            "kind": "maturation"
+        },
+        {
+            "source": "Hatch Royal",
+            "target": "Royal Facehugger",
+            "kind": "maturation"
+        },
+        {
+            "source": "Royal Facehugger",
+            "target": "Royal Implantation (Queen embryo)",
+            "kind": "implantation"
+        },
+        {
+            "source": "Human",
+            "target": "Royal Implantation (Queen embryo)",
+            "kind": "host"
+        },
+        {
+            "source": "Royal Implantation (Queen embryo)",
+            "target": "Chestburster",
+            "kind": "implantation"
+        },
+        {
+            "source": "Chestburster",
+            "target": "Queen",
+            "kind": "maturation"
+        },
+        {
+            "source": "Facehugger",
+            "target": "Implantation: Facehugger + Human",
+            "kind": "implantation"
+        },
+        {
+            "source": "Human",
+            "target": "Implantation: Facehugger + Human",
+            "kind": "host"
+        },
+        {
+            "source": "Implantation: Facehugger + Human",
+            "target": "Facehugger injects tadpole-like larva",
+            "kind": "gestation"
+        },
+        {
+            "source": "Facehugger injects tadpole-like larva",
+            "target": "Tadpole-like larva (P. praepotens)",
+            "kind": "gestation"
+        },
+        {
+            "source": "Tadpole-like larva (P. praepotens)",
+            "target": "Chestburster",
+            "kind": "maturation"
+        },
+        {
+            "source": "Chestburster",
+            "target": "Mature (Human host)",
+            "kind": "maturation"
+        },
+        {
+            "source": "Mature (Human host)",
+            "target": "Drone",
+            "kind": "maturation"
+        },
+        {
+            "source": "Mature (Human host)",
+            "target": "Warrior",
+            "kind": "maturation"
+        },
+        {
+            "source": "Facehugger",
+            "target": "Implantation: Facehugger + Dog",
+            "kind": "implantation"
+        },
+        {
+            "source": "Dog",
+            "target": "Implantation: Facehugger + Dog",
+            "kind": "host"
+        },
+        {
+            "source": "Implantation: Facehugger + Dog",
+            "target": "Chestburster",
+            "kind": "implantation"
+        },
+        {
+            "source": "Chestburster",
+            "target": "Mature (Quadruped host)",
+            "kind": "maturation"
+        },
+        {
+            "source": "Mature (Quadruped host)",
+            "target": "Runner",
+            "kind": "maturation"
+        },
+        {
+            "source": "Facehugger",
+            "target": "Implantation: Facehugger + Ox",
+            "kind": "implantation"
+        },
+        {
+            "source": "Ox",
+            "target": "Implantation: Facehugger + Ox",
+            "kind": "host"
+        },
+        {
+            "source": "Implantation: Facehugger + Ox",
+            "target": "Chestburster",
+            "kind": "implantation"
+        },
+        {
+            "source": "Ox",
+            "target": "Mature (Quadruped host)",
+            "kind": "host"
+        },
+        {
+            "source": "Drone",
+            "target": "Evolve: Drone → Praetorian",
+            "kind": "evolution"
+        },
+        {
+            "source": "Evolve: Drone → Praetorian",
+            "target": "Praetorian",
+            "kind": "evolution"
+        },
+        {
+            "source": "Praetorian",
+            "target": "Evolve: Praetorian → Queen",
+            "kind": "evolution"
+        },
+        {
+            "source": "Evolve: Praetorian → Queen",
+            "target": "Queen",
+            "kind": "evolution"
+        },
+        {
+            "source": "Drone",
+            "target": "Egg Morphing",
+            "kind": "biogenesis"
+        },
+        {
+            "source": "Cocooned Victim",
+            "target": "Egg Morphing",
+            "kind": "biogenesis"
+        },
+        {
+            "source": "Egg Morphing",
+            "target": "Egg (Ovomorph)",
+            "kind": "biogenesis"
+        },
+        {
+            "source": "Black Goo",
+            "target": "Black Goo + Human",
+            "kind": "infection"
+        },
+        {
+            "source": "Human",
+            "target": "Black Goo + Human",
+            "kind": "host"
+        },
+        {
+            "source": "Black Goo + Human",
+            "target": "Infected Human",
+            "kind": "infection"
+        },
+        {
+            "source": "Infected Human",
+            "target": "Infected Human → Trilobite",
+            "kind": "transmission"
+        },
+        {
+            "source": "Infected Human → Trilobite",
+            "target": "Trilobite",
+            "kind": "parasite"
+        },
+        {
+            "source": "Trilobite",
+            "target": "Trilobite + Engineer",
+            "kind": "impregnation"
+        },
+        {
+            "source": "Engineer",
+            "target": "Trilobite + Engineer",
+            "kind": "host"
+        },
+        {
+            "source": "Trilobite + Engineer",
+            "target": "Deacon",
+            "kind": "reproduction"
+        },
+        {
+            "source": "Black Goo",
+            "target": "Black Goo + Ecosystem",
+            "kind": "contaminate"
+        },
+        {
+            "source": "Black Goo + Ecosystem",
+            "target": "Pods (contaminated)",
+            "kind": "contaminate"
+        },
+        {
+            "source": "Pods (contaminated)",
+            "target": "Pods release Spores",
+            "kind": "release"
+        },
+        {
+            "source": "Pods release Spores",
+            "target": "Spores / Motes",
+            "kind": "release"
+        },
+        {
+            "source": "Spores / Motes",
+            "target": "Spores infect Human",
+            "kind": "infection"
+        },
+        {
+            "source": "Human",
+            "target": "Spores infect Human",
+            "kind": "host"
+        },
+        {
+            "source": "Spores infect Human",
+            "target": "Bloodburster",
+            "kind": "infection"
+        },
+        {
+            "source": "Bloodburster",
+            "target": "Bloodburster → Neomorph",
+            "kind": "maturation"
+        },
+        {
+            "source": "Bloodburster → Neomorph",
+            "target": "Neomorph",
+            "kind": "maturation"
+        },
+        {
+            "source": "Black Goo",
+            "target": "Experimental line",
+            "kind": "experiment"
+        },
+        {
+            "source": "Experimental line",
+            "target": "Protomorph",
+            "kind": "experiment"
+        },
+        {
+            "source": "Queen",
+            "target": "Cloning (Resurrection)",
+            "kind": "cloning"
+        },
+        {
+            "source": "Human",
+            "target": "Cloning (Resurrection)",
+            "kind": "cloning"
+        },
+        {
+            "source": "Cloning (Resurrection)",
+            "target": "Cloned Queen (human DNA)",
+            "kind": "cloning"
+        },
+        {
+            "source": "Cloned Queen (human DNA)",
+            "target": "Queen live birth (clone context)",
+            "kind": "anomalous"
+        },
+        {
+            "source": "Queen live birth (clone context)",
+            "target": "Newborn",
+            "kind": "anomalous"
+        },
+        {
+            "source": "Black Goo",
+            "target": "Experimental line",
+            "kind": "experiment"
+        },
+        {
+            "source": "Pregnant Human",
+            "target": "Experimental line",
+            "kind": "host"
+        },
+        {
+            "source": "Experimental line",
+            "target": "Offspring",
+            "kind": "result"
+        },
+        {
+            "source": "Trypanohyncha Ocellus",
+            "target": "Ocellus ocular takeover",
+            "kind": "parasitism"
+        },
+        {
+            "source": "Human",
+            "target": "Ocellus ocular takeover",
+            "kind": "host"
+        },
+        {
+            "source": "Cat",
+            "target": "Ocellus ocular takeover",
+            "kind": "host"
+        },
+        {
+            "source": "Ocellus ocular takeover",
+            "target": "Ocellus-controlled Host",
+            "kind": "parasite"
+        },
+        {
+            "source": "Unidentified Leech Species",
+            "target": "Leech attachment",
+            "kind": "parasitism"
+        },
+        {
+            "source": "Human",
+            "target": "Leech attachment",
+            "kind": "host"
+        },
+        {
+            "source": "Leech attachment",
+            "target": "Leech-parasitized Host",
+            "kind": "parasite"
+        }
+    ]
 }
