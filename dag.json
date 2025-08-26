@@ -203,7 +203,7 @@
             "id": "Infected Human",
             "type": "organism",
             "source": "https://alienanthology.fandom.com/wiki/Prometheus",
-            "image": "https://static.wikia.nocookie.net/alienanthology/images/1/1a/Holloway_infected.jpg/revision/latest/scale-to-width-down/300",
+            "image": "https://static.wikia.nocookie.net/alienanthology/images/1/1a/Holloway_infected.jpg",
             "description": "Human altered by exposure to the pathogen, enabling secondary parasitic outcomes."
         },
         {
