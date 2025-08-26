@@ -1,12 +1,7 @@
 {
     "title": "Alien Franchise — Cohesive Lifecycle Overview (Film Canon only; no AVP)",
     "scope": "Classic hive, Engineer pathogen branches, and experimental lines (Resurrection, Romulus).",
-    "roots": [
-        "Queen",
-        "Facehugger",
-        "Black Goo",
-        "Cloned Queen (human DNA)"
-    ],
+    
     "nodes": [
         {
             "id": "Human",
