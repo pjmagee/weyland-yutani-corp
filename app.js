@@ -63,7 +63,7 @@
       return;
     }
 
-    const svg = d3.select('#reactionSvg');
+  const svg = d3.select('#reactionSvg');
 
     const g = svg.append('g');
 
@@ -75,14 +75,23 @@
 
     const searchInput = document.getElementById('reactionSearch');
 
-    const tip = document.createElement('div');
+  const tip = document.createElement('div');
 
     tip.className = 'tip';
     document.body.appendChild(tip);
     const zoom = d3
       .zoom()
       .scaleExtent([0.4, 2.5])
-      .on('zoom', (ev) => g.attr('transform', ev.transform));
+      .on('zoom', (ev) => {
+        g.attr('transform', ev.transform);
+
+        // Fade labels when zoomed out to reduce clutter
+        const k = ev.transform.k;
+
+        if (g._linkLabelSel) g._linkLabelSel.style('opacity', k >= 0.9 ? 1 : 0);
+
+        if (g._nodeLabelSel) g._nodeLabelSel.style('opacity', k >= 0.6 ? 1 : 0.35);
+      });
 
     svg.call(zoom);
     const color = {
@@ -98,7 +107,7 @@
       meta: '#f0f0f0',
     };
 
-    const R = 19;
+  const R = 19;
 
     const RP = 17;
 
@@ -115,19 +124,20 @@
           (e) => nodeMap.has(e.source) && nodeMap.has(e.target)
         );
 
-        const sim = d3
+    const sim = d3
           .forceSimulation(nodes)
           .force(
             'link',
             d3
               .forceLink(links)
               .id((d) => d.id)
-              .distance(90)
-              .strength(0.4)
+        .distance(130)
+        .strength(0.25)
           )
-          .force('charge', d3.forceManyBody().strength(-200))
+      .force('charge', d3.forceManyBody().strength(-450))
           .force('center', d3.forceCenter(window.innerWidth / 2, (window.innerHeight - 52) / 2))
-          .force('collide', d3.forceCollide(28));
+      .force('collide', d3.forceCollide(34))
+      .velocityDecay(0.3);
 
         const link = linkG
           .selectAll('path')
@@ -136,7 +146,7 @@
           .append('path')
           .attr('class', 'edge');
 
-        const linkLabel = linkG
+  const linkLabel = linkG
           .selectAll('text')
           .data(links)
           .enter()
@@ -144,7 +154,7 @@
           .attr('class', 'edge-label')
           .text((d) => edgeLabel(d.kind));
 
-        const node = nodeG
+  const node = nodeG
           .selectAll('g')
           .data(nodes)
           .enter()
@@ -182,13 +192,21 @@
           })
           .on('mouseleave', () => (tip.style.opacity = 0));
 
-        sim.on('tick', () => {
+  sim.on('tick', () => {
           link.attr('d', (d) => curved(d));
           linkLabel
             .attr('x', (d) => (d.source.x + d.target.x) / 2)
             .attr('y', (d) => (d.source.y + d.target.y) / 2 - 6);
           node.attr('transform', (d) => `translate(${d.x},${d.y})`);
         });
+
+  // Hook selections to group for zoom-based visibility control
+  g._linkLabelSel = linkLabel;
+  g._nodeLabelSel = node.select('text.label');
+
+  // Initialize label visibility for the default zoom (1)
+  g._linkLabelSel.style('opacity', 1);
+  g._nodeLabelSel.style('opacity', 1);
 
         function drawLegend() {
           if (!legendEl) return;
