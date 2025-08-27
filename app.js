@@ -14,6 +14,20 @@
     );
   }
 
+  // Shared type -> color palette used by both visuals (keep legends consistent)
+  const TYPE_COLOR = {
+    host: '#e7f1ff',
+    agent: '#efefef',
+    vector: '#fff0c2',
+    artifact: '#fff7db',
+    stage: '#f3f6f9',
+    species: '#e9f7ef',
+    organism: '#f1f8ff',
+    hybrid: '#f9e6ef',
+    process: '#fbecff',
+    meta: '#f0f0f0',
+  };
+
   // Tab controller (one-time init per tab)
   const tabs = [
     {
@@ -94,18 +108,7 @@
       });
 
     svg.call(zoom);
-    const color = {
-      host: '#e7f1ff',
-      agent: '#efefef',
-      vector: '#fff0c2',
-      artifact: '#fff7db',
-      stage: '#f3f6f9',
-      species: '#e9f7ef',
-      organism: '#f1f8ff',
-      hybrid: '#f9e6ef',
-      process: '#fbecff',
-      meta: '#f0f0f0',
-    };
+  const color = TYPE_COLOR;
 
   const R = 19;
 
@@ -378,17 +381,7 @@
 
     svg.call(zoom);
 
-    const typeFill = {
-      host: '#e7f1ff',
-      artifact: '#fff7db',
-      vector: '#fff0c2',
-      stage: '#f3f6f9',
-      species: '#e9f7ef',
-      hybrid: '#f9e6ef',
-      agent: '#efefef',
-      organism: '#f1f8ff',
-      process: '#fbecff',
-    };
+  const typeFill = TYPE_COLOR;
 
     const edgeText = (k) =>
       ({
@@ -439,7 +432,7 @@
         icon.style.display = 'inline-block';
         icon.style.width = '18px';
         icon.style.height = '18px';
-        icon.style.background = typeFill[k] || '#fff';
+  icon.style.background = typeFill[k] || '#fff';
         icon.style.border = '1.5px solid #222';
 
         if (k === 'process') {
