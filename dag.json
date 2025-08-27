@@ -771,5 +771,140 @@
     "Hammerpede",
     "Offspring",
     "Newborn"
-  ]
+  ],
+  "scopes": {
+    "Runner": [
+      "Dog",
+      "Ox",
+      "Cocooned Victim",
+      "Egg (Ovomorph)",
+      "Facehugger",
+      "Chestburster",
+      "Mature (Quadruped host)",
+      "Lay Egg",
+      "Egg Morphing",
+      "Hatch Normal",
+      "Implantation: Facehugger + Dog",
+      "Implantation: Facehugger + Ox",
+      "Runner"
+    ],
+    "Queen": [
+      "Human",
+      "Cocooned Victim",
+      "Egg (Ovomorph)",
+      "Facehugger",
+      "Royal Facehugger",
+      "Chestburster",
+      "Praetorian",
+      "Lay Egg",
+      "Egg Morphing",
+      "Hatch Normal",
+      "Hatch Royal",
+      "Royal Implantation (Queen embryo)",
+      "Evolve: Drone → Praetorian",
+      "Evolve: Praetorian → Queen",
+      "Queen"
+    ],
+    "Drone": [
+      "Human",
+      "Cocooned Victim",
+      "Egg (Ovomorph)",
+      "Facehugger",
+      "Chestburster",
+      "Lay Egg",
+      "Egg Morphing",
+      "Hatch Normal",
+      "Implantation: Facehugger + Human",
+      "Mature (Human host)",
+      "Drone",
+      "Warrior"
+    ],
+    "Warrior": [
+      "Human",
+      "Cocooned Victim",
+      "Egg (Ovomorph)",
+      "Facehugger",
+      "Chestburster",
+      "Lay Egg",
+      "Egg Morphing",
+      "Hatch Normal",
+      "Implantation: Facehugger + Human",
+      "Mature (Human host)",
+      "Drone",
+      "Warrior"
+    ],
+    "Protomorph": [
+      "Black Goo",
+      "Human",
+      "Chestburster",
+      "Experimental line",
+      "Protomorph Egg",
+      "Hatch (Proto)",
+      "Proto-Facehugger",
+      "Implantation: Proto-Facehugger + Human",
+      "Mature (Proto host)",
+      "Protomorph"
+    ],
+    "Neomorph": [
+      "Black Goo",
+      "Black Goo + Ecosystem",
+      "Pods (contaminated)",
+      "Pods release Spores",
+      "Spores / Motes",
+      "Spores infect Human",
+      "Human",
+      "Bloodburster",
+      "Bloodburster → Neomorph",
+      "Neomorph"
+    ],
+    "Deacon": [
+      "Black Goo",
+      "Human",
+      "Black Goo + Human",
+      "Infected Human",
+      "Parasitic transfer (sexual)",
+      "Trilobite",
+      "Engineer",
+      "Trilobite + Engineer",
+      "Deacon"
+    ],
+    "Trilobite": [
+      "Black Goo",
+      "Human",
+      "Black Goo + Human",
+      "Infected Human",
+      "Parasitic transfer (sexual)",
+      "Trilobite"
+    ],
+    "Hammerpede": [
+      "Black Goo",
+      "Worms",
+      "Black Goo + Worms",
+      "Hammerpede"
+    ],
+    "Offspring": [
+      "Black Goo",
+      "Pregnant Human",
+      "Experimental line",
+      "Offspring"
+    ],
+    "Cloned Queen (human DNA)": [
+      "Queen",
+      "Human",
+      "Ellen Ripley (DNA)",
+      "Cloning (Resurrection)",
+      "Cloned Queen (human DNA)",
+      "Queen live birth (clone context)",
+      "Newborn"
+    ],
+    "Newborn": [
+      "Queen",
+      "Human",
+      "Ellen Ripley (DNA)",
+      "Cloning (Resurrection)",
+      "Cloned Queen (human DNA)",
+      "Queen live birth (clone context)",
+      "Newborn"
+    ]
+  }
 }

@@ -473,7 +473,7 @@
     fetch('dag.json')
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error('dag.json not found'))))
       .then((DATA) => {
-        const current = DATA;
+  const current = DATA;
 
         const nodesAll = [
           ...(current.nodes || []),
@@ -546,6 +546,10 @@
 
           if (!nodeMap.has(targetId)) return { nodes: [], links: [] };
 
+          const scopeList = (d.scopes && d.scopes[targetId]) || null;
+
+          const inScope = scopeList ? new Set(scopeList) : null;
+
           const nodesSet = new Set([targetId]);
 
           const edges = [];
@@ -558,11 +562,15 @@
             const ins = inc.get(v) || [];
 
             for (const e of ins) {
+              if (inScope && (!inScope.has(e.source) || !inScope.has(e.target))) continue;
+
               edges.push(e);
 
               if (!nodesSet.has(e.source)) {
-                nodesSet.add(e.source);
-                q.push(e.source);
+                if (!inScope || inScope.has(e.source)) {
+                  nodesSet.add(e.source);
+                  q.push(e.source);
+                }
               }
             }
           }
