@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "lint": "eslint . --ext .js --max-warnings=0",
-  "lint:fix": "eslint . --ext .js --fix",
+    "lint:fix": "eslint . --ext .js --fix",
     "format": "prettier --write ."
   },
   "devDependencies": {
