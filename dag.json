@@ -141,6 +141,7 @@
     {
       "id": "Runner",
       "type": "species",
+  "speciesGroup": "Xenomorph",
       "source": "https://alienanthology.fandom.com/wiki/Runner",
       "image": "https://static.wikia.nocookie.net/avp/images/4/48/Runner_2.PNG",
       "description": "Quadrupedal xenomorph morphology arising from a dog/ox host in Alien 3."
@@ -155,6 +156,7 @@
     {
       "id": "Queen",
       "type": "species",
+  "speciesGroup": "Xenomorph",
       "source": "https://alienanthology.fandom.com/wiki/Queen",
       "image": "https://static.wikia.nocookie.net/alienanthology/images/a/a4/Aliens_Queen.jpg",
       "description": "Egg-laying hive matriarch responsible for producing Ovomorphs."
