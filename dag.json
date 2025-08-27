@@ -125,6 +125,7 @@
     {
       "id": "Drone",
       "type": "species",
+  "speciesGroup": "Xenomorph",
       "source": "https://alienanthology.fandom.com/wiki/Drone",
       "image": "https://static.wikia.nocookie.net/alienanthology/images/8/83/Sevastopol_Alien.jpg",
       "description": "Adult xenomorph caste observed in Alien; stealthy hunter with biomechanical features."
@@ -132,6 +133,7 @@
     {
       "id": "Warrior",
       "type": "species",
+  "speciesGroup": "Xenomorph",
       "source": "https://alienanthology.fandom.com/wiki/Soldier",
       "image": "https://static.wikia.nocookie.net/alienanthology/images/d/d4/Aliens_still23.jpg",
       "description": "Aggressive hive defenders seen in Aliens; sometimes referred to as Soldiers."

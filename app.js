@@ -485,14 +485,19 @@
         );
 
         (current.finalProducts || []).forEach((id) => targetsSet.add(id));
-        const targets = Array.from(targetsSet);
+  const targets = Array.from(targetsSet);
 
         rootSel.innerHTML = '';
         targets.forEach((id, i) => {
           const opt = document.createElement('option');
 
           opt.value = id;
-          opt.textContent = id;
+
+          const nodeInfo = nodesAll.find((n) => n.id === id);
+
+          const group = nodeInfo && nodeInfo.speciesGroup ? `${nodeInfo.speciesGroup} — ` : '';
+
+          opt.textContent = `${group}${id}`;
 
           if (i === 0) opt.selected = true;
           rootSel.appendChild(opt);
