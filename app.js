@@ -119,45 +119,13 @@
 
     const RP = 17;
 
-    // Load reaction graph and merge optional metadata from dag.json for rich tooltips
-    Promise.all([
-      fetch('reaction.json').then((r) =>
-        r.ok ? r.json() : Promise.reject(new Error('reaction.json not found'))
-      ),
-      fetch('dag.json').then((r) => (r.ok ? r.json() : {})).catch(() => ({})),
-    ])
-      .then(([data, dag]) => {
-        // Build a metadata map from dag.json (nodes + processes)
-        const metaMap = new Map();
+    // Load reaction graph (now includes embedded metadata for tooltips)
+    fetch('reaction.json')
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error('reaction.json not found'))))
+      .then((data) => {
+        const procNodes = (data.processes || []).map((p) => ({ id: p.id || p, type: 'process', source: p.source || null, image: p.image || null, description: p.description || '' }));
 
-        if (dag && (dag.nodes || dag.processes)) {
-          (dag.nodes || []).forEach((n) => {
-            metaMap.set(n.id, {
-              source: n.source || null,
-              image: n.image || null,
-              description: n.description || '',
-              type: n.type || null,
-            });
-          });
-          (dag.processes || []).forEach((p) => {
-            metaMap.set(p.id, {
-              source: p.source || null,
-              image: p.image || null,
-              description: p.description || '',
-              type: 'process',
-            });
-          });
-        }
-
-        const procNodes = (data.processes || []).map((p) => ({ id: p.id || p, type: 'process' }));
-
-        const nodes = [...(data.nodes || []), ...procNodes].map((n) => {
-          const meta = metaMap.get(n.id);
-
-          return meta
-            ? { ...n, source: meta.source, image: meta.image, description: meta.description }
-            : n;
-        });
+        const nodes = [...(data.nodes || []), ...procNodes];
 
         const nodeMap = new Map(nodes.map((n) => [n.id, n]));
 
