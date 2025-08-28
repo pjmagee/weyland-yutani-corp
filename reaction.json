@@ -421,15 +421,11 @@
       "kind": "host"
     },
     {
-      "source": "Royal Implantation (Queen embryo)",
-      "target": "Chestburster",
+  "source": "Royal Implantation (Queen embryo)",
+  "target": "Chestburster",
       "kind": "implantation"
     },
-    {
-      "source": "Chestburster",
-      "target": "Queen",
-      "kind": "maturation"
-    },
+    
     {
       "source": "Facehugger",
       "target": "Implantation: Facehugger + Human",
