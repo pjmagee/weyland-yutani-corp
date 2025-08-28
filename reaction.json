@@ -195,7 +195,10 @@
     },
     {
       "id": "Ocellus-controlled Host",
-      "type": "organism"
+      "type": "organism",
+      "source": "https://alienanthology.fandom.com/wiki/Trypanohyncha_Ocellus",
+      "image": "https://i.redd.it/eryrb0z8prlf1.jpeg",
+      "description": "Host organism under ocular control by Trypanohyncha Ocellus; example shown is a sheep with ocular replacement."
     },
     {
       "id": "Unidentified Leech Species",
@@ -206,12 +209,21 @@
       "type": "organism"
     },
     {
-      "id": "Tadpole-like larva (P. praepotens)",
-      "type": "stage"
+      "id": "Xenomorph embryo (tadpole)",
+      "type": "stage",
+      "source": "https://thedirect.com/article/alien-earth-episode-3-xenomorph-lore-tadpole-life-stage",
+      "image": "https://images.thedirect.com/media/photos/tadpole.jpg",
+      "aka": [
+        "P. praepotens"
+      ],
+      "description": "Newly revealed life stage in Alien: Earth—wriggling Xenomorph embryo extracted from a Facehugger; aquatic, invades host tissue before developing into a Chestburster. Also referenced as 'P. praepotens' in Alien: Romulus (android report)."
     },
     {
       "id": "D. Plumbicare",
-      "type": "species"
+      "type": "species",
+      "source": "https://alienanthology.fandom.com/wiki/D._Plumbicare",
+      "image": "https://static.wikia.nocookie.net/alienanthology/images/c/c0/D_Plumbicare.png",
+      "description": "Bulbous, pod-like carnivorous organism catalogued aboard the USCSS Maginot; mimics flora, lures with mucilage, and closes under threat."
     },
     {
       "id": "Infected Human",
@@ -271,7 +283,10 @@
       "description": "A royal facehugger implants a Queen embryo into a suitable host."
     },
     {
-      "id": "Facehugger injects tadpole-like larva"
+      "id": "Facehugger injects Xenomorph embryo (tadpole)",
+      "source": "https://thedirect.com/article/alien-earth-episode-3-xenomorph-lore-tadpole-life-stage",
+      "image": null,
+      "description": "Clarified implantation step from Alien: Earth where the Facehugger delivers a tadpole-like Xenomorph embryo (designated 'P. praepotens' in Alien: Romulus dialogue)."
     },
     {
       "id": "Mature (Human host)",
@@ -427,16 +442,16 @@
     },
     {
       "source": "Implantation: Facehugger + Human",
-      "target": "Facehugger injects tadpole-like larva",
+      "target": "Facehugger injects Xenomorph embryo (tadpole)",
       "kind": "gestation"
     },
     {
-      "source": "Facehugger injects tadpole-like larva",
-      "target": "Tadpole-like larva (P. praepotens)",
+      "source": "Facehugger injects Xenomorph embryo (tadpole)",
+      "target": "Xenomorph embryo (tadpole)",
       "kind": "gestation"
     },
     {
-      "source": "Tadpole-like larva (P. praepotens)",
+      "source": "Xenomorph embryo (tadpole)",
       "target": "Chestburster",
       "kind": "maturation"
     },
