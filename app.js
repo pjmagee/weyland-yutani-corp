@@ -93,6 +93,11 @@
 
     tip.className = 'tip';
     document.body.appendChild(tip);
+
+    let pinned = false;
+
+    let pinnedNode = null;
+
     const zoom = d3
       .zoom()
       .scaleExtent([0.4, 2.5])
@@ -114,12 +119,45 @@
 
     const RP = 17;
 
-    fetch('reaction.json')
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error('reaction.json not found'))))
-      .then((data) => {
+    // Load reaction graph and merge optional metadata from dag.json for rich tooltips
+    Promise.all([
+      fetch('reaction.json').then((r) =>
+        r.ok ? r.json() : Promise.reject(new Error('reaction.json not found'))
+      ),
+      fetch('dag.json').then((r) => (r.ok ? r.json() : {})).catch(() => ({})),
+    ])
+      .then(([data, dag]) => {
+        // Build a metadata map from dag.json (nodes + processes)
+        const metaMap = new Map();
+
+        if (dag && (dag.nodes || dag.processes)) {
+          (dag.nodes || []).forEach((n) => {
+            metaMap.set(n.id, {
+              source: n.source || null,
+              image: n.image || null,
+              description: n.description || '',
+              type: n.type || null,
+            });
+          });
+          (dag.processes || []).forEach((p) => {
+            metaMap.set(p.id, {
+              source: p.source || null,
+              image: p.image || null,
+              description: p.description || '',
+              type: 'process',
+            });
+          });
+        }
+
         const procNodes = (data.processes || []).map((p) => ({ id: p.id || p, type: 'process' }));
 
-        const nodes = [...(data.nodes || []), ...procNodes];
+        const nodes = [...(data.nodes || []), ...procNodes].map((n) => {
+          const meta = metaMap.get(n.id);
+
+          return meta
+            ? { ...n, source: meta.source, image: meta.image, description: meta.description }
+            : n;
+        });
 
         const nodeMap = new Map(nodes.map((n) => [n.id, n]));
 
@@ -186,14 +224,32 @@
 
           sel.append('text').attr('class', 'label').attr('dy', -26).text(d.id);
         });
+        // Hover quick-tip and click-to-pin with rich details
         node
           .on('mousemove', (ev, d) => {
-            tip.innerHTML = `<b>${escapeHtml(d.id)}</b> <span class="pill">${escapeHtml(d.type || '')}</span>`;
-            tip.style.left = `${ev.clientX + 12}px`;
-            tip.style.top = `${ev.clientY + 12}px`;
-            tip.style.opacity = 1;
+            if (pinned) return;
+            showQuickTip(d, ev);
           })
-          .on('mouseleave', () => (tip.style.opacity = 0));
+          .on('mouseleave', () => {
+            if (pinned) return;
+            hideTip();
+          })
+          .on('click', (ev, d) => {
+            ev.stopPropagation();
+
+            if (pinned && pinnedNode && pinnedNode.id === d.id) {
+              unpin();
+            } else {
+              pinTooltip(d, ev);
+            }
+          });
+
+        // Click empty space to unpin
+        svg.on('click', (ev) => {
+          if (ev.target && ev.target.tagName === 'svg' && pinned) unpin();
+        });
+
+        tip.addEventListener('click', (e) => e.stopPropagation());
 
   sim.on('tick', () => {
           link.attr('d', (d) => curved(d));
@@ -211,7 +267,7 @@
   g._linkLabelSel.style('opacity', 1);
   g._nodeLabelSel.style('opacity', 1);
 
-        function drawLegend() {
+  function drawLegend() {
           if (!legendEl) return;
           const keys = [
             'host',
@@ -265,7 +321,7 @@
 
         drawLegend();
 
-        function runSearch(q) {
+  function runSearch(q) {
           const query = (q || '').trim().toLowerCase();
 
           const ids = new Set();
@@ -283,7 +339,7 @@
           sim.force('center', d3.forceCenter(window.innerWidth / 2, (window.innerHeight - 52) / 2))
         );
 
-        function curved(d) {
+  function curved(d) {
           const sx = d.source.x,
             sy = d.source.y,
             tx = d.target.x,
@@ -295,7 +351,7 @@
           return `M${sx},${sy} Q${cx},${cy} ${tx},${ty}`;
         }
 
-        function drag(sim) {
+  function drag(sim) {
           function dragstarted(event, d) {
             if (!event.active) sim.alphaTarget(0.3).restart();
             d.fx = d.x;
@@ -316,7 +372,7 @@
           return d3.drag().on('start', dragstarted).on('drag', dragged).on('end', dragended);
         }
 
-        function edgeLabel(kind) {
+  function edgeLabel(kind) {
           const map = {
             reproduction: 'lays/produces',
             maturation: 'matures',
@@ -338,6 +394,79 @@
           };
 
           return map[kind] || kind;
+        }
+
+        // Tooltip helpers
+        function showQuickTip(d, ev) {
+          tip.innerHTML =
+            `<b>${escapeHtml(d.id)}</b> <span class="pill">${escapeHtml(d.type || '')}</span>` +
+            '<div style="margin-top:4px;color:#ddd">Click for details</div>';
+          tip.style.left = `${ev.clientX + 12}px`;
+          tip.style.top = `${ev.clientY + 12}px`;
+          tip.style.opacity = 1;
+          tip.style.pointerEvents = 'none';
+        }
+
+        function buildPinnedHtml(d) {
+          const src = d.source
+            ? `<div style="margin:6px 0 8px"><a href="${escapeHtml(d.source)}" target="_blank" rel="noopener">Open SOURCE →</a></div>`
+            : '<div style="margin:6px 0 8px"><span>No source link</span></div>';
+
+          const img = d.image
+            ? `<div class="thumb" style="margin:6px 0 8px"><img alt="thumbnail" src="${escapeHtml(
+                d.image
+              )}" style="max-width:260px;border-radius:6px;border:1px solid #333"/></div>`
+            : '';
+
+          const body = `<div class="body" style="max-width:300px;line-height:1.35">${escapeHtml(
+            d.description || 'No description.'
+          )}</div>`;
+
+          return (
+            `<div style="display:flex;align-items:center;gap:8px;justify-content:space-between"><div><b>${escapeHtml(
+              d.id
+            )}</b> <span class="pill">${escapeHtml(
+              d.type || ''
+            )}</span></div><button id="rxTipCloseBtn" aria-label="Close" style="border:none;background:#333;color:#fff;border-radius:12px;padding:2px 8px;cursor:pointer">×</button></div>` +
+            src +
+            img +
+            body
+          );
+        }
+
+        function pinTooltip(d, ev) {
+          pinned = true;
+          pinnedNode = d;
+          const rectW = 320,
+            rectH = 420;
+
+          const px = Math.max(8, Math.min(window.innerWidth - rectW - 8, ev.clientX + 12));
+
+          const py = Math.max(8, Math.min(window.innerHeight - rectH - 8, ev.clientY + 12));
+
+          tip.style.left = `${px}px`;
+          tip.style.top = `${py}px`;
+          tip.style.opacity = 1;
+          tip.style.pointerEvents = 'auto';
+          tip.innerHTML = buildPinnedHtml(d);
+          const btn = document.getElementById('rxTipCloseBtn');
+
+          if (btn)
+            btn.onclick = (e) => {
+              e.stopPropagation();
+              unpin();
+            };
+        }
+
+        function hideTip() {
+          tip.style.opacity = 0;
+          tip.style.pointerEvents = 'none';
+        }
+
+        function unpin() {
+          pinned = false;
+          pinnedNode = null;
+          hideTip();
         }
       })
       .catch((err) => {
