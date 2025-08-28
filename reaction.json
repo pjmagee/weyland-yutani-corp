@@ -188,7 +188,10 @@
     },
     {
       "id": "Trypanohyncha Ocellus",
-      "type": "species"
+      "type": "species",
+      "source": "https://alienanthology.fandom.com/wiki/Trypanohyncha_Ocellus",
+      "image": "https://static.wikia.nocookie.net/alienanthology/images/b/b0/Trypanohyncha_Ocellus.png",
+      "description": "Parasitical extraterrestrial that replaces a host's eye using powerful tentacles and hijacks ocular pathways to control the body; can mimic the host's eye. Catalogued aboard the USCSS Maginot."
     },
     {
       "id": "Ocellus-controlled Host",
@@ -352,7 +355,10 @@
       "description": "An anomalous reproductive event where the cloned Queen delivers a live hybrid."
     },
     {
-      "id": "Ocellus ocular takeover"
+      "id": "Ocellus ocular takeover",
+      "source": "https://alienanthology.fandom.com/wiki/Trypanohyncha_Ocellus",
+      "image": null,
+      "description": "Ocellus enters the eye socket, dislodges the eye, replaces it and overrides neural signals, effectively controlling the host."
     },
     {
       "id": "Leech attachment"
